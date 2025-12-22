@@ -14,14 +14,12 @@
     --muted:#8e8e93;
     --line:rgba(0,0,0,.06);
 
-    /* Default typing highlight (yellow) */
+    /* highlight colors */
     --hl-yellow: rgba(255,243,199,.95);
-
-    /* 4 other highlight colors */
-    --hl-mint: rgba(208,244,222,.95);
-    --hl-lav:  rgba(221,214,255,.95);
-    --hl-pink: rgba(255,214,226,.95);
-    --hl-sky:  rgba(207,235,255,.95);
+    --hl-mint:   rgba(208,244,222,.95);
+    --hl-lav:    rgba(221,214,255,.95);
+    --hl-pink:   rgba(255,214,226,.95);
+    --hl-sky:    rgba(207,235,255,.95);
   }
 
   html,body{
@@ -30,53 +28,46 @@
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
     background:var(--bg);
     color:var(--ink);
-    overflow:hidden; /* ✅ no scrolling */
+    overflow:hidden;
   }
 
   /* ===== Fit-to-screen wrapper ===== */
-  .viewport{
-    width:100vw;
-    height:100vh;
-    overflow:hidden;
-    position:relative;
-  }
-  .scale{
-    position:absolute;
-    top:0; left:0;
-    transform-origin: top left;
-    will-change: transform;
-  }
+  .viewport{ width:100vw; height:100vh; overflow:hidden; position:relative; }
+  .scale{ position:absolute; top:0; left:0; transform-origin: top left; will-change: transform; }
 
-  /* ===== Layout ===== */
+  /* ===== Base canvas size ===== */
   .app{
-    width: 1200px;      /* base design width */
-    height: 800px;      /* base design height */
+    width: 1280px;
+    height: 820px;
     display:grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: 330px 1fr;
   }
 
-  /* ===== Sidebar calendar ===== */
+  /* ===== Sidebar ===== */
   .sidebar{
     border-right:1px solid var(--line);
-    padding:16px 14px;
+    padding:14px 14px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-height:0;
   }
 
   .sidebar-header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:12px;
   }
 
   .sidebar-header strong{
-    font-size:18px;     /* ↓ smaller */
+    font-size:18px;
     font-weight:900;
   }
 
   .sidebar-header button{
     border:none;
     background:none;
-    font-size:22px;     /* ↓ smaller */
+    font-size:22px;
     padding:2px 6px;
     cursor:pointer;
     border-radius:10px;
@@ -91,56 +82,126 @@
   }
 
   .dow div{
-    font-size:12px;     /* ↓ smaller */
+    font-size:12px;
     color:var(--muted);
-    padding:4px 0 8px;
+    padding:2px 0 6px;
     font-weight:700;
   }
 
   .day{
-    padding:10px 0;     /* tighter */
+    padding:9px 0;
     border-radius:10px;
     cursor:pointer;
-    font-size:14px;     /* ↓ smaller */
+    font-size:14px;
     font-weight:600;
+    user-select:none;
   }
   .day:hover{ background:rgba(0,0,0,.04); }
   .day.inactive{ color:#c7c7cc; }
   .day.today{ font-weight:900; }
-  .day.active{
-    background:#007aff;
-    color:#fff;
+  .day.active{ background:#007aff; color:#fff; font-weight:900; }
+
+  /* ===== Idea Board (NO auto highlight) ===== */
+  .idea-board{
+    margin-top:6px;
+    padding-top:8px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-height:0;
+    flex:1;
+  }
+
+  .idea-header{
+    font-size:14px;
     font-weight:900;
   }
 
+  .idea-entry{
+    border-radius:12px;
+    border:none;
+    background:rgba(0,0,0,.03);
+    padding:10px 10px;
+    font-size:13px;
+    outline:none;
+  }
+  .idea-entry:focus{ background:rgba(0,0,0,.05); }
+
+  .idea-list{
+    flex:1;
+    min-height:0;
+    overflow:auto;
+    padding-right:4px;
+  }
+
+  .idea-block{
+    border:none;
+    border-radius:12px;
+    padding:10px 10px;
+    margin-bottom:8px;
+    background:rgba(0,0,0,.03);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    user-select:none;
+  }
+  .idea-block:hover{ background:rgba(0,0,0,.045); }
+  .idea-block:active{ transform:scale(.995); }
+  .idea-block.dragging{ opacity:.65; }
+
+  .idea-text{
+    font-size:13px;
+    line-height:1.35;
+    font-weight:650;
+    word-break:break-word;
+  }
+
+  .idea-del{
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1;
+    padding:6px 6px;
+    border-radius:10px;
+  }
+  .idea-del:hover{ background:rgba(0,0,0,.06); color:var(--ink); }
+
   /* ===== Main ===== */
   .main{
-    padding:18px 20px;  /* tighter */
+    padding:18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-height:0;
   }
 
   .note-title{
-    font-size:26px;     /* ↓ smaller */
+    font-size:26px;
     font-weight:950;
-    margin-bottom:6px;
     letter-spacing:.2px;
   }
 
   .note-sub{
-    font-size:14px;     /* ↓ smaller */
+    font-size:14px;
     color:var(--muted);
-    margin-bottom:16px;
+    margin-top:-2px;
   }
 
-  /* ===== Week Mon–Sat ===== */
   .week{
     display:grid;
     grid-template-columns:repeat(6, 1fr);
-    height: calc(100% - 60px);
+    gap:0;
+    flex:1;
+    min-height:0;
   }
 
   .day-col{
-    padding:0 14px;     /* tighter */
+    padding:0 14px;
     position:relative;
+    min-width:0;
   }
 
   .day-col:not(:last-child)::after{
@@ -154,40 +215,79 @@
   }
 
   .day-name{
-    font-size:16px;     /* ↓ smaller */
-    font-weight:950;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
     margin-bottom:10px;
   }
 
-  .section{ margin-bottom:12px; }
-  .section-emoji{ font-size:16px; margin-bottom:6px; } /* ↓ smaller */
-
-  /* ===== Editor (2 lines max) ===== */
-  .editor{
-    width:100%;
-    font-size:14px;         /* ↓ smaller */
-    line-height:1.45;
-    padding:6px 8px;
-    border-radius:10px;
-    background:transparent;
-    outline:none;
-
-    /* 2 lines fixed */
-    min-height:calc(2 * 1.45em + 12px);
-    max-height:calc(2 * 1.45em + 12px);
-    overflow:hidden;
-
-    white-space:pre-wrap;
-    word-break:break-word;
+  .day-name .dow{
+    font-size:16px;
+    font-weight:950;
+    white-space:nowrap;
+  }
+  .day-name .date{
+    font-size:11px;
+    color:var(--muted);
+    font-weight:700;
+    white-space:nowrap;
   }
 
-  /* Highlight spans */
+  .section{ margin-bottom:12px; }
+  .section-emoji{ font-size:16px; margin-bottom:6px; }
+
+  /* slot is borderless */
+  .slot{
+    min-height: 54px;
+    border-radius:12px;
+    border:none;
+    padding:2px 0;
+    margin-bottom:8px;
+    position:relative;
+    background:transparent;
+  }
+  .slot.drag-over{
+    background: rgba(0,0,0,.03);
+  }
+
+  /* TASK BLOCK: no grey box. Only highlight shows. */
+  .task-block{
+    border:none;
+    background:transparent;
+    padding:6px 2px;
+    border-radius:10px;
+    user-select:none;
+    cursor:grab;
+  }
+  .task-block:active{ cursor:grabbing; }
+  .task-block.dragging{ opacity:.65; }
+
+  .task-content{
+    font-size:13px;
+    line-height:1.35;
+    font-weight:650;
+    word-break:break-word;
+    padding:2px 0;
+  }
+
+  /* highlight spans */
   .hl{ border-radius:6px; padding:0 .15em; }
   .hl-yellow{ background:var(--hl-yellow); }
   .hl-mint{ background:var(--hl-mint); }
   .hl-lav{ background:var(--hl-lav); }
   .hl-pink{ background:var(--hl-pink); }
   .hl-sky{ background:var(--hl-sky); }
+
+  /* editing mode */
+  .task-block.editing{
+    cursor:text;
+    user-select:text;
+  }
+  .task-block.editing .task-content{
+    outline:none;
+    background:transparent;
+  }
 
   /* ===== Palette ===== */
   .palette{
@@ -209,6 +309,7 @@
     border:1px solid rgba(0,0,0,.08);
     cursor:pointer;
   }
+  .swatch:active{ transform:scale(.96); }
 
   .sw-yellow{ background:var(--hl-yellow); }
   .sw-mint{ background:var(--hl-mint); }
@@ -234,23 +335,37 @@
   <div class="scale" id="scale">
     <div class="app" id="app">
 
+      <!-- Sidebar -->
       <aside class="sidebar">
-        <div class="sidebar-header">
-          <button id="prevMonth" aria-label="Previous month">‹</button>
-          <strong id="monthLabel"></strong>
-          <button id="nextMonth" aria-label="Next month">›</button>
+        <!-- Calendar -->
+        <div>
+          <div class="sidebar-header">
+            <button id="prevMonth" aria-label="Previous month">‹</button>
+            <strong id="monthLabel"></strong>
+            <button id="nextMonth" aria-label="Next month">›</button>
+          </div>
+
+          <div class="dow" aria-hidden="true">
+            <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+          </div>
+
+          <div class="calendar" id="calendar"></div>
         </div>
 
-        <div class="dow" aria-hidden="true">
-          <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
-        </div>
-
-        <div class="calendar" id="calendar"></div>
+        <!-- Idea Board -->
+        <section class="idea-board">
+          <div class="idea-header">Ideas</div>
+          <input class="idea-entry" id="ideaText" type="text" placeholder="New note" maxlength="120" />
+          <div class="idea-list" id="ideaList"></div>
+        </section>
       </aside>
 
+      <!-- Main -->
       <main class="main">
-        <div class="note-title" id="weekTitle"></div>
-        <div class="note-sub" id="weekRange"></div>
+        <div>
+          <div class="note-title" id="weekTitle"></div>
+          <div class="note-sub" id="weekRange"></div>
+        </div>
         <div class="week" id="week"></div>
       </main>
 
@@ -270,25 +385,19 @@
 
 <script>
 /* =========================
-   Fit-to-screen scaling (NO SCROLL)
+   Fit-to-screen scaling
 ========================= */
 const scaleEl = document.getElementById("scale");
 const appEl = document.getElementById("app");
 
 function fitToScreen(){
-  // measure base size (unscaled)
   const baseW = appEl.offsetWidth;
   const baseH = appEl.offsetHeight;
-
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-
-  // scale to fit BOTH width & height
   const s = Math.min(vw / baseW, vh / baseH);
 
   scaleEl.style.transform = `scale(${s})`;
-
-  // center the scaled app
   const scaledW = baseW * s;
   const scaledH = baseH * s;
   scaleEl.style.left = `${Math.max(0, (vw - scaledW)/2)}px`;
@@ -299,10 +408,31 @@ window.addEventListener("resize", fitToScreen);
 /* =========================
    Storage
 ========================= */
-const KEY = "weekly_notes_auto_yellow_fit_v1";
+const KEY = "weekly_notes_noidea_highlight_move_anywhere_v1";
 const store = safeParse(localStorage.getItem(KEY)) || {};
 function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
 const save = () => localStorage.setItem(KEY, JSON.stringify(store));
+if(!store.__ideas) store.__ideas = [];
+
+/*
+store[YYYY-MM-DD] = { m:[block|null, block|null], a:[...], e:[...] }
+block = { id, html }   // html will contain highlight spans; default yellow once in calendar
+Idea blocks: { id, text } (PLAIN, no highlight)
+*/
+
+function ensureDay(k){
+  if(!store[k]) store[k] = { m:[null,null], a:[null,null], e:[null,null] };
+  for(const part of ["m","a","e"]){
+    if(!Array.isArray(store[k][part])) store[k][part] = [null,null];
+    if(store[k][part].length < 2) store[k][part] = [store[k][part][0]||null, store[k][part][1]||null];
+    if(store[k][part].length > 2) store[k][part] = store[k][part].slice(0,2);
+  }
+}
+
+function wrapYellowFromPlain(text){
+  const safe = escapeHtml(text);
+  return `<span class="hl hl-yellow">${safe}</span>`;
+}
 
 /* =========================
    Dates
@@ -313,23 +443,15 @@ let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
 const ymd = d => d.toISOString().slice(0,10);
 const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); x.setHours(0,0,0,0); return x; }
-const startOfWeek = d => { const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; } // Sunday start
+const startOfWeek = d => { const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; }
 const weekOfMonth = d => {
   const first = new Date(d.getFullYear(), d.getMonth(), 1);
   return Math.ceil((d.getDate() + first.getDay()) / 7);
 };
-
-function ensureDay(k){
-  if(!store[k]) store[k] = { m:["",""], a:["",""], e:["",""] };
-  for (const part of ["m","a","e"]) {
-    if (!Array.isArray(store[k][part])) store[k][part] = ["",""];
-    if (store[k][part].length < 2) store[k][part] = [store[k][part][0] || "", ""];
-    if (store[k][part].length > 2) store[k][part] = store[k][part].slice(0,2);
-  }
-}
+function shortDate(d){ return d.toLocaleDateString(undefined,{month:"numeric", day:"numeric"}); }
 
 /* =========================
-   Calendar render
+   Calendar
 ========================= */
 const calendar = document.getElementById("calendar");
 const monthLabel = document.getElementById("monthLabel");
@@ -355,7 +477,68 @@ function renderCalendar(){
 }
 
 /* =========================
-   Week render (Mon–Sat)
+   Ideas (PLAIN, no highlight)
+========================= */
+const ideaListEl = document.getElementById("ideaList");
+const ideaInput = document.getElementById("ideaText");
+
+function renderIdeas(){
+  ideaListEl.innerHTML = "";
+  (store.__ideas || []).forEach((it) => {
+    const row = document.createElement("div");
+    row.className = "idea-block";
+    row.draggable = true;
+    row.dataset.id = it.id;
+
+    row.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("application/x-move-type", "idea");
+      e.dataTransfer.setData("application/x-idea-id", it.id);
+      e.dataTransfer.setData("text/plain", it.text);
+      e.dataTransfer.effectAllowed = "copy";
+      row.classList.add("dragging");
+    });
+    row.addEventListener("dragend", () => row.classList.remove("dragging"));
+
+    const text = document.createElement("div");
+    text.className = "idea-text";
+    text.textContent = it.text;
+
+    const del = document.createElement("button");
+    del.className = "idea-del";
+    del.type = "button";
+    del.textContent = "✕";
+    del.onclick = () => {
+      store.__ideas = (store.__ideas || []).filter(x => x.id !== it.id);
+      save();
+      renderIdeas();
+    };
+
+    row.appendChild(text);
+    row.appendChild(del);
+    ideaListEl.appendChild(row);
+  });
+}
+
+function addIdea(){
+  const v = (ideaInput.value || "").trim();
+  if(!v) return;
+  store.__ideas.unshift({ id: uid(), text: v });
+  ideaInput.value = "";
+  save();
+  renderIdeas();
+}
+
+ideaInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter"){
+    e.preventDefault();
+    addIdea();
+  }
+});
+
+/* =========================
+   Week (Mon–Sat)
+   - slots accept: IDEA (copy) -> becomes YELLOW highlighted
+   - slots accept: TASK (move) between any day/time/slot (including filled slots: swap)
 ========================= */
 const weekEl = document.getElementById("week");
 const weekTitle = document.getElementById("weekTitle");
@@ -364,7 +547,7 @@ const weekRange = document.getElementById("weekRange");
 function renderWeek(){
   weekEl.innerHTML = "";
 
-  const start = startOfWeek(active); // Sunday
+  const start = startOfWeek(active);
   const monday = addDays(start, 1);
   const saturday = addDays(start, 6);
 
@@ -373,24 +556,20 @@ function renderWeek(){
 
   const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const offsets = [1,2,3,4,5,6];
-  const sections = [
-    ["m","☀️"],
-    ["a","🌤"],
-    ["e","🌙"]
-  ];
+  const sections = [["m","☀️"],["a","🌤"],["e","🌙"]];
 
   days.forEach((dayName, idx)=>{
     const d = addDays(start, offsets[idx]);
-    const key = ymd(d);
-    ensureDay(key);
+    const dayKey = ymd(d);
+    ensureDay(dayKey);
 
     const col = document.createElement("div");
     col.className = "day-col";
 
-    const name = document.createElement("div");
-    name.className = "day-name";
-    name.textContent = dayName;
-    col.appendChild(name);
+    const head = document.createElement("div");
+    head.className = "day-name";
+    head.innerHTML = `<div class="dow">${dayName}</div><div class="date">${shortDate(d)}</div>`;
+    col.appendChild(head);
 
     sections.forEach(([part, emoji])=>{
       const sec = document.createElement("div");
@@ -401,42 +580,79 @@ function renderWeek(){
       icon.textContent = emoji;
       sec.appendChild(icon);
 
-      for(let n=0;n<2;n++){
-        const ed = document.createElement("div");
-        ed.className = "editor";
-        ed.contentEditable = "true";
-        ed.spellcheck = true;
+      for(let slotIdx=0; slotIdx<2; slotIdx++){
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        slot.dataset.dayKey = dayKey;
+        slot.dataset.part = part;
+        slot.dataset.idx = String(slotIdx);
 
-        ed.dataset.dayKey = key;
-        ed.dataset.part = part;
-        ed.dataset.idx = String(n);
+        const block = store[dayKey][part][slotIdx];
+        if (block && block.html) slot.appendChild(renderTaskBlock(block, dayKey, part, slotIdx));
 
-        ed.innerHTML = store[key][part][n] || "";
-        autoYellowize(ed);
-        enforceTwoLines(ed);
-
-        ed.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            if (getLineCount(ed) >= 2) e.preventDefault();
-          }
-        });
-
-        ed.addEventListener("paste", (e) => {
+        slot.addEventListener("dragover", (e) => {
           e.preventDefault();
-          const text = (e.clipboardData || window.clipboardData).getData("text/plain");
-          insertTextAtCursor(text);
-          handleTyping(ed);
+          slot.classList.add("drag-over");
+          const type = e.dataTransfer.getData("application/x-move-type");
+          e.dataTransfer.dropEffect = (type === "task") ? "move" : "copy";
+        });
+        slot.addEventListener("dragleave", () => slot.classList.remove("drag-over"));
+        slot.addEventListener("drop", (e) => {
+          e.preventDefault();
+          slot.classList.remove("drag-over");
+
+          const type = e.dataTransfer.getData("application/x-move-type");
+
+          if (type === "task") {
+            // move/swap between any slot
+            const fromJson = e.dataTransfer.getData("application/x-task-from") || "";
+            const from = safeParse(fromJson);
+            if (!from) return;
+
+            if (from.dayKey === dayKey && from.part === part && String(from.idx) === String(slotIdx)) return;
+
+            ensureDay(from.dayKey);
+            const moving = store[from.dayKey][from.part][Number(from.idx)];
+            if (!moving) return;
+
+            const target = store[dayKey][part][slotIdx] || null;
+
+            // SWAP (so user can drop onto filled slot)
+            store[dayKey][part][slotIdx] = moving;
+            store[from.dayKey][from.part][Number(from.idx)] = target;
+
+            save();
+            renderWeek();
+            hidePalette();
+            return;
+          }
+
+          // IDEA copy -> create new yellow-highlighted block
+          const text = (e.dataTransfer.getData("text/plain") || "").trim();
+          if (!text) return;
+
+          const newBlock = { id: uid(), html: wrapYellowFromPlain(text) };
+
+          // if target occupied, do nothing (keeps simple) — or swap? better: swap with empty? We'll do "swap" by pushing to first empty slot in same section
+          if (store[dayKey][part][slotIdx]) {
+            const arr = store[dayKey][part];
+            const emptyIndex = arr.findIndex(x => !x);
+            if (emptyIndex !== -1) {
+              arr[emptyIndex] = newBlock;
+            } else {
+              // no empty slot, just ignore
+              return;
+            }
+          } else {
+            store[dayKey][part][slotIdx] = newBlock;
+          }
+
+          save();
+          renderWeek();
+          hidePalette();
         });
 
-        ed.addEventListener("input", () => handleTyping(ed));
-
-        ed.addEventListener("mouseup", () => maybeShowPalette(ed));
-        ed.addEventListener("keyup", () => maybeShowPalette(ed));
-        ed.addEventListener("blur", () => {
-          setTimeout(() => { if (!paletteMatchesActiveEditor()) hidePalette(); }, 120);
-        });
-
-        sec.appendChild(ed);
+        sec.appendChild(slot);
       }
 
       col.appendChild(sec);
@@ -444,33 +660,118 @@ function renderWeek(){
 
     weekEl.appendChild(col);
   });
+}
 
+/* Task block rendering + moving + double click to edit */
+function renderTaskBlock(block, dayKey, part, idx){
+  const wrap = document.createElement("div");
+  wrap.className = "task-block";
+  wrap.draggable = true;
+  wrap.dataset.dayKey = dayKey;
+  wrap.dataset.part = part;
+  wrap.dataset.idx = String(idx);
+
+  const content = document.createElement("div");
+  content.className = "task-content";
+  content.innerHTML = block.html;
+
+  wrap.addEventListener("dragstart", (e) => {
+    const sel = window.getSelection();
+    if (wrap.classList.contains("editing") && sel && !sel.isCollapsed) { e.preventDefault(); return; }
+
+    e.dataTransfer.setData("application/x-move-type", "task");
+    e.dataTransfer.setData("application/x-task-from", JSON.stringify({ dayKey, part, idx }));
+    e.dataTransfer.effectAllowed = "move";
+    wrap.classList.add("dragging");
+  });
+  wrap.addEventListener("dragend", () => wrap.classList.remove("dragging"));
+
+  wrap.addEventListener("dblclick", (e) => {
+    e.preventDefault();
+    enterEditMode(wrap, content);
+  });
+
+  wrap.appendChild(content);
+  return wrap;
+}
+
+/* ===== Edit mode: auto-yellow for NEW typed text inside task only ===== */
+function enterEditMode(wrap, content){
+  wrap.classList.add("editing");
+  content.contentEditable = "true";
+  content.spellcheck = true;
+  content.focus();
+
+  const onInput = () => {
+    autoYellowize(content);          // only in calendar tasks
+    enforceTwoLinesContent(content);
+    persistTaskFromContent(wrap, content);
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") { e.preventDefault(); exitEditMode(wrap, content); }
+  };
+
+  const onBlur = () => {
+    setTimeout(() => { if (!content.contains(document.activeElement)) exitEditMode(wrap, content); }, 80);
+  };
+
+  content.addEventListener("input", onInput);
+  content.addEventListener("keydown", onKeyDown);
+  content.addEventListener("mouseup", () => maybeShowPaletteFor(content));
+  content.addEventListener("keyup", () => maybeShowPaletteFor(content));
+  content.addEventListener("blur", onBlur);
+
+  wrap._editHandlers = { onInput, onKeyDown, onBlur };
+}
+
+function exitEditMode(wrap, content){
+  if (!wrap.classList.contains("editing")) return;
+
+  wrap.classList.remove("editing");
+  content.contentEditable = "false";
+  content.blur();
+  hidePalette();
+
+  const h = wrap._editHandlers;
+  if (h){
+    content.removeEventListener("input", h.onInput);
+    content.removeEventListener("keydown", h.onKeyDown);
+    content.removeEventListener("blur", h.onBlur);
+    wrap._editHandlers = null;
+  }
+
+  autoYellowize(content);
+  enforceTwoLinesContent(content);
+  persistTaskFromContent(wrap, content);
+
+  renderWeek();
+}
+
+function persistTaskFromContent(wrap, content){
+  const dayKey = wrap.dataset.dayKey;
+  const part = wrap.dataset.part;
+  const idx = Number(wrap.dataset.idx);
+  ensureDay(dayKey);
+
+  const html = content.innerHTML.trim();
+  if (!html || !stripText(content).trim()){
+    store[dayKey][part][idx] = null;
+  } else {
+    const existing = store[dayKey][part][idx];
+    store[dayKey][part][idx] = { id: existing?.id || uid(), html };
+  }
   save();
 }
 
-function handleTyping(ed){
-  const caret = getCaretOffset(ed);
-  autoYellowize(ed);
-  enforceTwoLines(ed);
-  setCaretOffset(ed, caret);
-
-  const key = ed.dataset.dayKey;
-  const part = ed.dataset.part;
-  const idx = Number(ed.dataset.idx);
-  store[key][part][idx] = ed.innerHTML;
-  save();
-}
-
-/* =========================
-   Auto yellow highlight
-========================= */
-function autoYellowize(ed){
-  if (!ed.textContent.trim() && ed.innerHTML.replace(/<br\s*\/?>/g,"").trim()==="") {
-    ed.innerHTML = "";
+/* ===== Auto-yellow highlight (TASKS ONLY) ===== */
+function autoYellowize(root){
+  if (!stripText(root).trim() && root.innerHTML.replace(/<br\s*\/?>/g,"").trim()==="") {
+    root.innerHTML = "";
     return;
   }
 
-  const walker = document.createTreeWalker(ed, NodeFilter.SHOW_TEXT, null);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
   const toWrap = [];
 
   while (walker.nextNode()) {
@@ -487,12 +788,11 @@ function autoYellowize(ed){
     span.textContent = textNode.nodeValue;
     textNode.parentNode.replaceChild(span, textNode);
   }
-
-  mergeAdjacentHighlights(ed);
+  mergeAdjacentHighlights(root);
 }
 
-function mergeAdjacentHighlights(ed){
-  const spans = ed.querySelectorAll("span.hl");
+function mergeAdjacentHighlights(root){
+  const spans = root.querySelectorAll("span.hl");
   spans.forEach(sp => {
     const next = sp.nextSibling;
     if (next && next.nodeType === 1 && next.tagName === "SPAN" && next.className === sp.className) {
@@ -502,89 +802,49 @@ function mergeAdjacentHighlights(ed){
   });
 }
 
-/* =========================
-   2-line enforcement
-========================= */
-function getLineCount(ed){
-  const text = ed.innerText.replace(/\u00A0/g, " ");
-  if (!text.trim()) return 1;
-  return text.split(/\r?\n/).length;
+function stripText(el){
+  return (el.innerText || "").replace(/\u00A0/g," ");
 }
 
-function enforceTwoLines(ed){
-  let safety = 2000;
-  const maxH = ed.clientHeight;
-  while (ed.scrollHeight > maxH + 1 && safety-- > 0) {
-    trimLastCharacter(ed);
+/* ===== Two-line enforcement ===== */
+function enforceTwoLinesContent(contentEl){
+  const maxLines = 2;
+  const text = stripText(contentEl);
+  const lines = text.split(/\r?\n/);
+  if (lines.length > maxLines) {
+    contentEl.innerHTML = escapeHtml(lines.slice(0,maxLines).join(" "));
+    autoYellowize(contentEl);
   }
+  let safety = 2500;
+  const maxH = 54;
+  while (contentEl.scrollHeight > maxH && safety-- > 0) trimLastCharacter(contentEl);
 }
 
 function trimLastCharacter(container){
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
   let last = null;
   while (walker.nextNode()) last = walker.currentNode;
-
-  if (last && last.nodeValue.length > 0) {
-    last.nodeValue = last.nodeValue.slice(0, -1);
-    return;
-  }
+  if (last && last.nodeValue.length > 0) { last.nodeValue = last.nodeValue.slice(0, -1); return; }
   if (container.lastChild) container.removeChild(container.lastChild);
 }
 
 /* =========================
-   Caret save/restore
-========================= */
-function getCaretOffset(root){
-  const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return null;
-  const range = sel.getRangeAt(0);
-  if (!root.contains(range.startContainer)) return null;
-
-  const pre = document.createRange();
-  pre.selectNodeContents(root);
-  pre.setEnd(range.startContainer, range.startOffset);
-  return pre.toString().length;
-}
-
-function setCaretOffset(root, offset){
-  if (offset == null) return;
-  const sel = window.getSelection();
-  if (!sel) return;
-
-  let current = 0;
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-  while (walker.nextNode()) {
-    const node = walker.currentNode;
-    const len = node.nodeValue.length;
-    if (current + len >= offset) {
-      const r = document.createRange();
-      r.setStart(node, Math.max(0, offset - current));
-      r.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(r);
-      return;
-    }
-    current += len;
-  }
-}
-
-/* =========================
-   Highlight palette
+   Highlight Palette (editing only)
 ========================= */
 const palette = document.getElementById("palette");
 const clearBtn = document.getElementById("clearHl");
-let activeEditor = null;
+let activeEditableContent = null;
 
-function selectionInsideEditor(editor){
+function selectionInside(node){
   const sel = window.getSelection();
   if (!sel || sel.rangeCount === 0) return false;
   const range = sel.getRangeAt(0);
-  return editor.contains(range.commonAncestorContainer) && !sel.isCollapsed;
+  return node.contains(range.commonAncestorContainer) && !sel.isCollapsed;
 }
 
-function maybeShowPalette(editor){
-  if (!selectionInsideEditor(editor)) { hidePalette(); return; }
-  activeEditor = editor;
+function maybeShowPaletteFor(contentNode){
+  if (!selectionInside(contentNode)) { hidePalette(); return; }
+  activeEditableContent = contentNode;
 
   const sel = window.getSelection();
   const rect = sel.getRangeAt(0).getBoundingClientRect();
@@ -601,21 +861,17 @@ function maybeShowPalette(editor){
 
 function hidePalette(){
   palette.style.display = "none";
-  activeEditor = null;
-}
-
-function paletteMatchesActiveEditor(){
-  return document.activeElement === palette || palette.contains(document.activeElement);
+  activeEditableContent = null;
 }
 
 function applyHighlight(className){
-  if (!activeEditor) return;
+  if (!activeEditableContent) return;
   const sel = window.getSelection();
   if (!sel || sel.rangeCount === 0) return;
 
   const range = sel.getRangeAt(0);
   if (sel.isCollapsed) return;
-  if (!activeEditor.contains(range.commonAncestorContainer)) return;
+  if (!activeEditableContent.contains(range.commonAncestorContainer)) return;
 
   const span = document.createElement("span");
   span.className = `hl ${className}`;
@@ -625,14 +881,11 @@ function applyHighlight(className){
     span.appendChild(contents);
     range.insertNode(span);
 
-    autoYellowize(activeEditor);
-    enforceTwoLines(activeEditor);
+    autoYellowize(activeEditableContent);
+    enforceTwoLinesContent(activeEditableContent);
 
-    const key = activeEditor.dataset.dayKey;
-    const part = activeEditor.dataset.part;
-    const idx = Number(activeEditor.dataset.idx);
-    store[key][part][idx] = activeEditor.innerHTML;
-    save();
+    const wrap = activeEditableContent.closest(".task-block");
+    if (wrap) persistTaskFromContent(wrap, activeEditableContent);
 
     sel.removeAllRanges();
     const r = document.createRange();
@@ -641,22 +894,22 @@ function applyHighlight(className){
     sel.addRange(r);
 
     hidePalette();
-    activeEditor.focus();
+    activeEditableContent.focus();
   } catch {
     hidePalette();
   }
 }
 
 function clearHighlightInSelection(){
-  if (!activeEditor) return;
+  if (!activeEditableContent) return;
   const sel = window.getSelection();
   if (!sel || sel.rangeCount === 0) return;
 
   const range = sel.getRangeAt(0);
   if (sel.isCollapsed) return;
-  if (!activeEditor.contains(range.commonAncestorContainer)) return;
+  if (!activeEditableContent.contains(range.commonAncestorContainer)) return;
 
-  const spans = activeEditor.querySelectorAll("span.hl");
+  const spans = activeEditableContent.querySelectorAll("span.hl");
   spans.forEach(sp => {
     const spRange = document.createRange();
     spRange.selectNodeContents(sp);
@@ -672,17 +925,14 @@ function clearHighlightInSelection(){
     }
   });
 
-  autoYellowize(activeEditor);
-  enforceTwoLines(activeEditor);
+  autoYellowize(activeEditableContent);
+  enforceTwoLinesContent(activeEditableContent);
 
-  const key = activeEditor.dataset.dayKey;
-  const part = activeEditor.dataset.part;
-  const idx = Number(activeEditor.dataset.idx);
-  store[key][part][idx] = activeEditor.innerHTML;
-  save();
+  const wrap = activeEditableContent.closest(".task-block");
+  if (wrap) persistTaskFromContent(wrap, activeEditableContent);
 
   hidePalette();
-  activeEditor.focus();
+  activeEditableContent.focus();
 }
 
 document.querySelectorAll(".swatch").forEach(sw => {
@@ -694,22 +944,20 @@ clearBtn.addEventListener("click", clearHighlightInSelection);
 
 document.addEventListener("mousedown", (e) => {
   if (palette.contains(e.target)) return;
-  if (e.target.classList && e.target.classList.contains("editor")) return;
+  if (e.target.closest && e.target.closest(".task-block.editing")) return;
   hidePalette();
 });
-window.addEventListener("scroll", () => hidePalette(), { passive:true });
 
-function insertTextAtCursor(text){
-  const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
-  const range = sel.getRangeAt(0);
-  range.deleteContents();
-  const node = document.createTextNode(text);
-  range.insertNode(node);
-  range.setStartAfter(node);
-  range.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(range);
+/* =========================
+   Helpers
+========================= */
+function uid(){
+  return (crypto?.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+}
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 /* Month nav */
@@ -718,6 +966,7 @@ document.getElementById("nextMonth").onclick=()=>{ viewMonth.setMonth(viewMonth.
 
 /* init */
 renderCalendar();
+renderIdeas();
 renderWeek();
 fitToScreen();
 </script>

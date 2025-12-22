@@ -6,7 +6,7 @@
 <title>Weekly Notes</title>
 
 <style>
-  *{box-sizing:border-box;}
+  *{ box-sizing:border-box; }
 
   :root{
     --bg:#ffffff;
@@ -30,38 +30,54 @@
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
     background:var(--bg);
     color:var(--ink);
+    overflow:hidden; /* ✅ no scrolling */
+  }
+
+  /* ===== Fit-to-screen wrapper ===== */
+  .viewport{
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    position:relative;
+  }
+  .scale{
+    position:absolute;
+    top:0; left:0;
+    transform-origin: top left;
+    will-change: transform;
   }
 
   /* ===== Layout ===== */
   .app{
-    height:100%;
+    width: 1200px;      /* base design width */
+    height: 800px;      /* base design height */
     display:grid;
-    grid-template-columns:320px 1fr;
+    grid-template-columns: 300px 1fr;
   }
 
-  /* ===== Calendar ===== */
+  /* ===== Sidebar calendar ===== */
   .sidebar{
     border-right:1px solid var(--line);
-    padding:20px 18px;
+    padding:16px 14px;
   }
 
   .sidebar-header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:18px;
+    margin-bottom:12px;
   }
 
   .sidebar-header strong{
-    font-size:22px;
+    font-size:18px;     /* ↓ smaller */
     font-weight:900;
   }
 
   .sidebar-header button{
     border:none;
     background:none;
-    font-size:26px;
-    padding:4px 8px;
+    font-size:22px;     /* ↓ smaller */
+    padding:2px 6px;
     cursor:pointer;
     border-radius:10px;
     color:var(--ink);
@@ -75,17 +91,17 @@
   }
 
   .dow div{
-    font-size:14px;
+    font-size:12px;     /* ↓ smaller */
     color:var(--muted);
-    padding:6px 0 10px;
+    padding:4px 0 8px;
     font-weight:700;
   }
 
   .day{
-    padding:14px 0;
-    border-radius:12px;
+    padding:10px 0;     /* tighter */
+    border-radius:10px;
     cursor:pointer;
-    font-size:18px;
+    font-size:14px;     /* ↓ smaller */
     font-weight:600;
   }
   .day:hover{ background:rgba(0,0,0,.04); }
@@ -99,37 +115,34 @@
 
   /* ===== Main ===== */
   .main{
-    padding:36px 40px;
-    overflow-y:auto;
+    padding:18px 20px;  /* tighter */
   }
 
   .note-title{
-    font-size:38px;
+    font-size:26px;     /* ↓ smaller */
     font-weight:950;
-    margin-bottom:10px;
+    margin-bottom:6px;
     letter-spacing:.2px;
   }
 
   .note-sub{
-    font-size:20px;
+    font-size:14px;     /* ↓ smaller */
     color:var(--muted);
-    margin-bottom:44px;
+    margin-bottom:16px;
   }
 
   /* ===== Week Mon–Sat ===== */
   .week{
     display:grid;
-    grid-template-columns:repeat(6,minmax(230px,1fr));
-    gap:0;
+    grid-template-columns:repeat(6, 1fr);
+    height: calc(100% - 60px);
   }
 
   .day-col{
-    padding:0 26px;
+    padding:0 14px;     /* tighter */
     position:relative;
-    min-width:230px;
   }
 
-  /* soft divider */
   .day-col:not(:last-child)::after{
     content:"";
     position:absolute;
@@ -141,37 +154,35 @@
   }
 
   .day-name{
-    font-size:24px;
+    font-size:16px;     /* ↓ smaller */
     font-weight:950;
-    margin-bottom:18px;
+    margin-bottom:10px;
   }
 
-  .section{ margin-bottom:26px; }
-  .section-emoji{ font-size:24px; margin-bottom:10px; }
+  .section{ margin-bottom:12px; }
+  .section-emoji{ font-size:16px; margin-bottom:6px; } /* ↓ smaller */
 
   /* ===== Editor (2 lines max) ===== */
   .editor{
     width:100%;
-    font-size:22px;          /* bigger writing */
-    line-height:1.55;
-    padding:8px 12px;
-    border-radius:12px;
+    font-size:14px;         /* ↓ smaller */
+    line-height:1.45;
+    padding:6px 8px;
+    border-radius:10px;
     background:transparent;
     outline:none;
 
-    min-height:calc(2 * 1.55em + 16px);
-    max-height:calc(2 * 1.55em + 16px);
+    /* 2 lines fixed */
+    min-height:calc(2 * 1.45em + 12px);
+    max-height:calc(2 * 1.45em + 12px);
     overflow:hidden;
 
     white-space:pre-wrap;
     word-break:break-word;
   }
 
-  /* Default highlight span + colored variants */
-  .hl{
-    border-radius:6px;
-    padding:0 .15em;
-  }
+  /* Highlight spans */
+  .hl{ border-radius:6px; padding:0 .15em; }
   .hl-yellow{ background:var(--hl-yellow); }
   .hl-mint{ background:var(--hl-mint); }
   .hl-lav{ background:var(--hl-lav); }
@@ -183,22 +194,21 @@
     position:fixed;
     z-index:9999;
     display:none;
-    padding:8px 10px;
+    padding:7px 9px;
     border-radius:14px;
     background:rgba(255,255,255,.95);
-    box-shadow:0 12px 40px rgba(0,0,0,.18);
+    box-shadow:0 10px 30px rgba(0,0,0,.16);
     border:1px solid rgba(0,0,0,.06);
     backdrop-filter: blur(10px);
-    gap:10px;
+    gap:9px;
     align-items:center;
   }
 
   .swatch{
-    width:18px;height:18px;border-radius:999px;
+    width:16px;height:16px;border-radius:999px;
     border:1px solid rgba(0,0,0,.08);
     cursor:pointer;
   }
-  .swatch:active{ transform:scale(.96); }
 
   .sw-yellow{ background:var(--hl-yellow); }
   .sw-mint{ background:var(--hl-mint); }
@@ -211,49 +221,45 @@
     background:transparent;
     cursor:pointer;
     color:var(--muted);
-    font-size:12px;
-    padding:6px 8px;
+    font-size:11px;
+    padding:5px 7px;
     border-radius:10px;
   }
   .pal-btn:hover{ background:rgba(0,0,0,.05); color:var(--ink); }
-
-  @media(max-width:980px){
-    .app{ grid-template-columns:1fr; }
-    .sidebar{ border-right:none; border-bottom:1px solid var(--line); }
-    .week{ grid-template-columns:1fr; }
-    .day-col::after{ display:none; }
-    .day-col{ padding:18px 0; min-width:auto; }
-  }
 </style>
 </head>
 
 <body>
-<div class="app">
+<div class="viewport">
+  <div class="scale" id="scale">
+    <div class="app" id="app">
 
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <button id="prevMonth" aria-label="Previous month">‹</button>
-      <strong id="monthLabel"></strong>
-      <button id="nextMonth" aria-label="Next month">›</button>
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <button id="prevMonth" aria-label="Previous month">‹</button>
+          <strong id="monthLabel"></strong>
+          <button id="nextMonth" aria-label="Next month">›</button>
+        </div>
+
+        <div class="dow" aria-hidden="true">
+          <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+        </div>
+
+        <div class="calendar" id="calendar"></div>
+      </aside>
+
+      <main class="main">
+        <div class="note-title" id="weekTitle"></div>
+        <div class="note-sub" id="weekRange"></div>
+        <div class="week" id="week"></div>
+      </main>
+
     </div>
-
-    <div class="dow" aria-hidden="true">
-      <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
-    </div>
-
-    <div class="calendar" id="calendar"></div>
-  </aside>
-
-  <main class="main">
-    <div class="note-title" id="weekTitle"></div>
-    <div class="note-sub" id="weekRange"></div>
-    <div class="week" id="week"></div>
-  </main>
+  </div>
 </div>
 
 <!-- highlight palette -->
 <div class="palette" id="palette" role="dialog" aria-label="Highlight colors">
-  <!-- Default is yellow, but user can switch -->
   <div class="swatch sw-yellow" data-class="hl-yellow" title="Yellow"></div>
   <div class="swatch sw-mint"   data-class="hl-mint"   title="Mint"></div>
   <div class="swatch sw-lav"    data-class="hl-lav"    title="Lavender"></div>
@@ -263,417 +269,362 @@
 </div>
 
 <script>
-  /* =========================
-     Storage
-  ========================== */
-  const KEY = "weekly_notes_auto_yellow_v1";
-  const store = safeParse(localStorage.getItem(KEY)) || {};
-  function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
-  const save = () => localStorage.setItem(KEY, JSON.stringify(store));
+/* =========================
+   Fit-to-screen scaling (NO SCROLL)
+========================= */
+const scaleEl = document.getElementById("scale");
+const appEl = document.getElementById("app");
 
-  /* =========================
-     Dates
-  ========================== */
-  const today = new Date(); today.setHours(0,0,0,0);
-  let active = new Date(today);
-  let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+function fitToScreen(){
+  // measure base size (unscaled)
+  const baseW = appEl.offsetWidth;
+  const baseH = appEl.offsetHeight;
 
-  const ymd = d => d.toISOString().slice(0,10);
-  const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); x.setHours(0,0,0,0); return x; }
-  const startOfWeek = d => { const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; } // Sunday start
-  const weekOfMonth = d => {
-    const first = new Date(d.getFullYear(), d.getMonth(), 1);
-    return Math.ceil((d.getDate() + first.getDay()) / 7);
-  };
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
 
-  function ensureDay(k){
-    if(!store[k]) store[k] = { m:["",""], a:["",""], e:["",""] };
-    for (const part of ["m","a","e"]) {
-      if (!Array.isArray(store[k][part])) store[k][part] = ["",""];
-      if (store[k][part].length < 2) store[k][part] = [store[k][part][0] || "", ""];
-      if (store[k][part].length > 2) store[k][part] = store[k][part].slice(0,2);
-    }
+  // scale to fit BOTH width & height
+  const s = Math.min(vw / baseW, vh / baseH);
+
+  scaleEl.style.transform = `scale(${s})`;
+
+  // center the scaled app
+  const scaledW = baseW * s;
+  const scaledH = baseH * s;
+  scaleEl.style.left = `${Math.max(0, (vw - scaledW)/2)}px`;
+  scaleEl.style.top  = `${Math.max(0, (vh - scaledH)/2)}px`;
+}
+window.addEventListener("resize", fitToScreen);
+
+/* =========================
+   Storage
+========================= */
+const KEY = "weekly_notes_auto_yellow_fit_v1";
+const store = safeParse(localStorage.getItem(KEY)) || {};
+function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
+const save = () => localStorage.setItem(KEY, JSON.stringify(store));
+
+/* =========================
+   Dates
+========================= */
+const today = new Date(); today.setHours(0,0,0,0);
+let active = new Date(today);
+let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+const ymd = d => d.toISOString().slice(0,10);
+const addDays = (d,n)=>{ const x=new Date(d); x.setDate(x.getDate()+n); x.setHours(0,0,0,0); return x; }
+const startOfWeek = d => { const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; } // Sunday start
+const weekOfMonth = d => {
+  const first = new Date(d.getFullYear(), d.getMonth(), 1);
+  return Math.ceil((d.getDate() + first.getDay()) / 7);
+};
+
+function ensureDay(k){
+  if(!store[k]) store[k] = { m:["",""], a:["",""], e:["",""] };
+  for (const part of ["m","a","e"]) {
+    if (!Array.isArray(store[k][part])) store[k][part] = ["",""];
+    if (store[k][part].length < 2) store[k][part] = [store[k][part][0] || "", ""];
+    if (store[k][part].length > 2) store[k][part] = store[k][part].slice(0,2);
   }
+}
 
-  /* =========================
-     Calendar render
-  ========================== */
-  const calendar = document.getElementById("calendar");
-  const monthLabel = document.getElementById("monthLabel");
+/* =========================
+   Calendar render
+========================= */
+const calendar = document.getElementById("calendar");
+const monthLabel = document.getElementById("monthLabel");
 
-  function renderCalendar(){
-    calendar.innerHTML = "";
-    monthLabel.textContent = viewMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+function renderCalendar(){
+  calendar.innerHTML = "";
+  monthLabel.textContent = viewMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});
 
-    const start = startOfWeek(new Date(viewMonth));
-    for(let i=0;i<42;i++){
-      const d = addDays(start,i);
-      const div = document.createElement("div");
-      div.className = "day";
-      div.textContent = d.getDate();
+  const start = startOfWeek(new Date(viewMonth));
+  for(let i=0;i<42;i++){
+    const d = addDays(start,i);
+    const div = document.createElement("div");
+    div.className = "day";
+    div.textContent = d.getDate();
 
-      if(d.getMonth()!==viewMonth.getMonth()) div.classList.add("inactive");
-      if(ymd(d)===ymd(today)) div.classList.add("today");
-      if(ymd(d)===ymd(active)) div.classList.add("active");
+    if(d.getMonth()!==viewMonth.getMonth()) div.classList.add("inactive");
+    if(ymd(d)===ymd(today)) div.classList.add("today");
+    if(ymd(d)===ymd(active)) div.classList.add("active");
 
-      div.onclick = ()=>{ active=new Date(d); renderCalendar(); renderWeek(); hidePalette(); };
-      calendar.appendChild(div);
-    }
+    div.onclick = ()=>{ active=new Date(d); renderCalendar(); renderWeek(); hidePalette(); };
+    calendar.appendChild(div);
   }
+}
 
-  /* =========================
-     Week render (Mon–Sat)
-  ========================== */
-  const weekEl = document.getElementById("week");
-  const weekTitle = document.getElementById("weekTitle");
-  const weekRange = document.getElementById("weekRange");
+/* =========================
+   Week render (Mon–Sat)
+========================= */
+const weekEl = document.getElementById("week");
+const weekTitle = document.getElementById("weekTitle");
+const weekRange = document.getElementById("weekRange");
 
-  function renderWeek(){
-    weekEl.innerHTML = "";
+function renderWeek(){
+  weekEl.innerHTML = "";
 
-    const start = startOfWeek(active); // Sunday
-    const monday = addDays(start, 1);
-    const saturday = addDays(start, 6);
+  const start = startOfWeek(active); // Sunday
+  const monday = addDays(start, 1);
+  const saturday = addDays(start, 6);
 
-    weekTitle.textContent = `${active.toLocaleDateString(undefined,{month:"long"})}, Week ${weekOfMonth(active)}`;
-    weekRange.textContent = `${monday.toLocaleDateString()} – ${saturday.toLocaleDateString()}`;
+  weekTitle.textContent = `${active.toLocaleDateString(undefined,{month:"long"})}, Week ${weekOfMonth(active)}`;
+  weekRange.textContent = `${monday.toLocaleDateString()} – ${saturday.toLocaleDateString()}`;
 
-    const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    const offsets = [1,2,3,4,5,6];
+  const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const offsets = [1,2,3,4,5,6];
+  const sections = [
+    ["m","☀️"],
+    ["a","🌤"],
+    ["e","🌙"]
+  ];
 
-    const sections = [
-      ["m","☀️"], // sun for morning
-      ["a","🌤"],
-      ["e","🌙"]
-    ];
+  days.forEach((dayName, idx)=>{
+    const d = addDays(start, offsets[idx]);
+    const key = ymd(d);
+    ensureDay(key);
 
-    days.forEach((dayName, idx)=>{
-      const d = addDays(start, offsets[idx]);
-      const key = ymd(d);
-      ensureDay(key);
+    const col = document.createElement("div");
+    col.className = "day-col";
 
-      const col = document.createElement("div");
-      col.className = "day-col";
+    const name = document.createElement("div");
+    name.className = "day-name";
+    name.textContent = dayName;
+    col.appendChild(name);
 
-      const name = document.createElement("div");
-      name.className = "day-name";
-      name.textContent = dayName;
-      col.appendChild(name);
+    sections.forEach(([part, emoji])=>{
+      const sec = document.createElement("div");
+      sec.className = "section";
 
-      sections.forEach(([part, emoji])=>{
-        const sec = document.createElement("div");
-        sec.className = "section";
+      const icon = document.createElement("div");
+      icon.className = "section-emoji";
+      icon.textContent = emoji;
+      sec.appendChild(icon);
 
-        const icon = document.createElement("div");
-        icon.className = "section-emoji";
-        icon.textContent = emoji;
-        sec.appendChild(icon);
+      for(let n=0;n<2;n++){
+        const ed = document.createElement("div");
+        ed.className = "editor";
+        ed.contentEditable = "true";
+        ed.spellcheck = true;
 
-        for(let n=0;n<2;n++){
-          const ed = document.createElement("div");
-          ed.className = "editor";
-          ed.contentEditable = "true";
-          ed.spellcheck = true;
+        ed.dataset.dayKey = key;
+        ed.dataset.part = part;
+        ed.dataset.idx = String(n);
 
-          ed.dataset.dayKey = key;
-          ed.dataset.part = part;
-          ed.dataset.idx = String(n);
+        ed.innerHTML = store[key][part][n] || "";
+        autoYellowize(ed);
+        enforceTwoLines(ed);
 
-          ed.innerHTML = store[key][part][n] || "";
+        ed.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            if (getLineCount(ed) >= 2) e.preventDefault();
+          }
+        });
 
-          // Make sure existing content is yellow-highlighted by default where needed
-          autoYellowize(ed);
-          enforceTwoLines(ed);
+        ed.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const text = (e.clipboardData || window.clipboardData).getData("text/plain");
+          insertTextAtCursor(text);
+          handleTyping(ed);
+        });
 
-          ed.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-              // block Enter if already 2 lines
-              if (getLineCount(ed) >= 2) e.preventDefault();
-            }
-          });
+        ed.addEventListener("input", () => handleTyping(ed));
 
-          ed.addEventListener("paste", (e) => {
-            e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData("text/plain");
-            insertTextAtCursor(text);
-            handleTyping(ed);
-          });
+        ed.addEventListener("mouseup", () => maybeShowPalette(ed));
+        ed.addEventListener("keyup", () => maybeShowPalette(ed));
+        ed.addEventListener("blur", () => {
+          setTimeout(() => { if (!paletteMatchesActiveEditor()) hidePalette(); }, 120);
+        });
 
-          ed.addEventListener("input", () => handleTyping(ed));
+        sec.appendChild(ed);
+      }
 
-          // show palette when selecting text
-          ed.addEventListener("mouseup", () => maybeShowPalette(ed));
-          ed.addEventListener("keyup", () => maybeShowPalette(ed));
-          ed.addEventListener("blur", () => {
-            setTimeout(() => { if (!paletteMatchesActiveEditor()) hidePalette(); }, 120);
-          });
-
-          sec.appendChild(ed);
-        }
-
-        col.appendChild(sec);
-      });
-
-      weekEl.appendChild(col);
+      col.appendChild(sec);
     });
 
-    save();
+    weekEl.appendChild(col);
+  });
+
+  save();
+}
+
+function handleTyping(ed){
+  const caret = getCaretOffset(ed);
+  autoYellowize(ed);
+  enforceTwoLines(ed);
+  setCaretOffset(ed, caret);
+
+  const key = ed.dataset.dayKey;
+  const part = ed.dataset.part;
+  const idx = Number(ed.dataset.idx);
+  store[key][part][idx] = ed.innerHTML;
+  save();
+}
+
+/* =========================
+   Auto yellow highlight
+========================= */
+function autoYellowize(ed){
+  if (!ed.textContent.trim() && ed.innerHTML.replace(/<br\s*\/?>/g,"").trim()==="") {
+    ed.innerHTML = "";
+    return;
   }
 
-  function handleTyping(ed){
-    // Save caret offset so wrapping doesn't jump cursor
-    const caret = getCaretOffset(ed);
+  const walker = document.createTreeWalker(ed, NodeFilter.SHOW_TEXT, null);
+  const toWrap = [];
 
-    // Default behavior: everything typed becomes yellow highlighted
-    autoYellowize(ed);
-
-    // Enforce 2 lines
-    enforceTwoLines(ed);
-
-    // Restore caret (best-effort)
-    setCaretOffset(ed, caret);
-
-    // Persist
-    const key = ed.dataset.dayKey;
-    const part = ed.dataset.part;
-    const idx = Number(ed.dataset.idx);
-    store[key][part][idx] = ed.innerHTML;
-    save();
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    if (!node.nodeValue || !node.nodeValue.trim()) continue;
+    const parent = node.parentNode;
+    if (parent && parent.classList && parent.classList.contains("hl")) continue;
+    toWrap.push(node);
   }
 
-  /* =========================
-     Auto yellow highlight
-     Wrap plain text nodes in <span class="hl hl-yellow">
-     Leave already-colored spans alone.
-  ========================== */
-  function autoYellowize(ed){
-    // If empty, keep empty
-    if (!ed.textContent.trim() && ed.innerHTML.replace(/<br\s*\/?>/g,"").trim()==="") {
-      ed.innerHTML = "";
-      return;
-    }
-
-    const walker = document.createTreeWalker(ed, NodeFilter.SHOW_TEXT, null);
-    const toWrap = [];
-
-    while (walker.nextNode()) {
-      const node = walker.currentNode;
-      if (!node.nodeValue || !node.nodeValue.trim()) continue;
-
-      const parent = node.parentNode;
-      // Already inside highlight span?
-      if (parent && parent.classList && parent.classList.contains("hl")) continue;
-
-      toWrap.push(node);
-    }
-
-    for (const textNode of toWrap) {
-      const span = document.createElement("span");
-      span.className = "hl hl-yellow";
-      span.textContent = textNode.nodeValue;
-      textNode.parentNode.replaceChild(span, textNode);
-    }
-
-    // Normalize: merge adjacent spans of same class (optional light cleanup)
-    mergeAdjacentHighlights(ed);
-  }
-
-  function mergeAdjacentHighlights(ed){
-    const spans = ed.querySelectorAll("span.hl");
-    spans.forEach(sp => {
-      const next = sp.nextSibling;
-      if (next && next.nodeType === 1 && next.tagName === "SPAN" && next.className === sp.className) {
-        sp.textContent += next.textContent;
-        next.remove();
-      }
-    });
-  }
-
-  /* =========================
-     2-line enforcement
-  ========================== */
-  function getLineCount(ed){
-    const text = ed.innerText.replace(/\u00A0/g, " ");
-    if (!text.trim()) return 1;
-    return text.split(/\r?\n/).length;
-  }
-
-  function enforceTwoLines(ed){
-    // If overflow, trim from end until it fits.
-    // (Keeps highlights mostly intact; worst-case trims last characters.)
-    let safety = 4000;
-    const maxH = ed.clientHeight;
-    while (ed.scrollHeight > maxH + 1 && safety-- > 0) {
-      trimLastCharacter(ed);
-    }
-    // If still >2 lines due to pasted line breaks, remove extra breaks
-    if (getLineCount(ed) > 2) {
-      ed.innerHTML = ed.innerHTML.replace(/<br>\s*<br>/g, "<br>");
-    }
-  }
-
-  function trimLastCharacter(container){
-    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
-    let last = null;
-    while (walker.nextNode()) last = walker.currentNode;
-
-    if (last && last.nodeValue.length > 0) {
-      last.nodeValue = last.nodeValue.slice(0, -1);
-      if (last.nodeValue.length === 0) last.parentNode?.remove?.();
-      return;
-    }
-    if (container.lastChild) container.removeChild(container.lastChild);
-  }
-
-  /* =========================
-     Caret save/restore (best effort)
-  ========================== */
-  function getCaretOffset(root){
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return null;
-    const range = sel.getRangeAt(0);
-    if (!root.contains(range.startContainer)) return null;
-
-    const pre = document.createRange();
-    pre.selectNodeContents(root);
-    pre.setEnd(range.startContainer, range.startOffset);
-    return pre.toString().length;
-  }
-
-  function setCaretOffset(root, offset){
-    if (offset == null) return;
-    const sel = window.getSelection();
-    if (!sel) return;
-
-    let current = 0;
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-    while (walker.nextNode()) {
-      const node = walker.currentNode;
-      const len = node.nodeValue.length;
-      if (current + len >= offset) {
-        const r = document.createRange();
-        r.setStart(node, Math.max(0, offset - current));
-        r.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(r);
-        return;
-      }
-      current += len;
-    }
-    // fallback: end
-    root.focus();
-  }
-
-  /* =========================
-     Highlight palette
-  ========================== */
-  const palette = document.getElementById("palette");
-  const clearBtn = document.getElementById("clearHl");
-  let activeEditor = null;
-
-  function selectionInsideEditor(editor){
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return false;
-    const range = sel.getRangeAt(0);
-    return editor.contains(range.commonAncestorContainer) && !sel.isCollapsed;
-  }
-
-  function maybeShowPalette(editor){
-    if (!selectionInsideEditor(editor)) { hidePalette(); return; }
-    activeEditor = editor;
-
-    const sel = window.getSelection();
-    const rect = sel.getRangeAt(0).getBoundingClientRect();
-
-    const pad = 8;
-    const palW = 260;
-    const left = Math.min(Math.max(rect.left + rect.width/2 - palW/2, pad), window.innerWidth - palW - pad);
-    const top = Math.max(rect.top - 54, pad);
-
-    palette.style.left = `${left}px`;
-    palette.style.top = `${top}px`;
-    palette.style.display = "flex";
-  }
-
-  function hidePalette(){
-    palette.style.display = "none";
-    activeEditor = null;
-  }
-
-  function paletteMatchesActiveEditor(){
-    return document.activeElement === palette || palette.contains(document.activeElement);
-  }
-
-  // Wrap selection into a colored highlight span
-  function applyHighlight(className){
-    if (!activeEditor) return;
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return;
-
-    const range = sel.getRangeAt(0);
-    if (sel.isCollapsed) return;
-    if (!activeEditor.contains(range.commonAncestorContainer)) return;
-
+  for (const textNode of toWrap) {
     const span = document.createElement("span");
-    span.className = `hl ${className}`;
-
-    try{
-      const contents = range.extractContents();
-      span.appendChild(contents);
-      range.insertNode(span);
-
-      // Clean up: yellowize remaining plain text (keeps default behavior)
-      autoYellowize(activeEditor);
-      enforceTwoLines(activeEditor);
-
-      // Persist
-      const key = activeEditor.dataset.dayKey;
-      const part = activeEditor.dataset.part;
-      const idx = Number(activeEditor.dataset.idx);
-      store[key][part][idx] = activeEditor.innerHTML;
-      save();
-
-      // Move caret after inserted span
-      sel.removeAllRanges();
-      const r = document.createRange();
-      r.setStartAfter(span);
-      r.collapse(true);
-      sel.addRange(r);
-
-      hidePalette();
-      activeEditor.focus();
-    } catch {
-      hidePalette();
-    }
+    span.className = "hl hl-yellow";
+    span.textContent = textNode.nodeValue;
+    textNode.parentNode.replaceChild(span, textNode);
   }
 
-  // Remove highlight spans intersecting selection
-  function clearHighlightInSelection(){
-    if (!activeEditor) return;
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return;
+  mergeAdjacentHighlights(ed);
+}
 
-    const range = sel.getRangeAt(0);
-    if (sel.isCollapsed) return;
-    if (!activeEditor.contains(range.commonAncestorContainer)) return;
+function mergeAdjacentHighlights(ed){
+  const spans = ed.querySelectorAll("span.hl");
+  spans.forEach(sp => {
+    const next = sp.nextSibling;
+    if (next && next.nodeType === 1 && next.tagName === "SPAN" && next.className === sp.className) {
+      sp.textContent += next.textContent;
+      next.remove();
+    }
+  });
+}
 
-    const spans = activeEditor.querySelectorAll("span.hl");
-    spans.forEach(sp => {
-      const spRange = document.createRange();
-      spRange.selectNodeContents(sp);
+/* =========================
+   2-line enforcement
+========================= */
+function getLineCount(ed){
+  const text = ed.innerText.replace(/\u00A0/g, " ");
+  if (!text.trim()) return 1;
+  return text.split(/\r?\n/).length;
+}
 
-      const intersects =
-        range.compareBoundaryPoints(Range.END_TO_START, spRange) < 0 &&
-        range.compareBoundaryPoints(Range.START_TO_END, spRange) > 0;
+function enforceTwoLines(ed){
+  let safety = 2000;
+  const maxH = ed.clientHeight;
+  while (ed.scrollHeight > maxH + 1 && safety-- > 0) {
+    trimLastCharacter(ed);
+  }
+}
 
-      if (intersects) {
-        const parent = sp.parentNode;
-        while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
-        parent.removeChild(sp);
-      }
-    });
+function trimLastCharacter(container){
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
+  let last = null;
+  while (walker.nextNode()) last = walker.currentNode;
 
-    // After clearing, default behavior is yellow highlight
+  if (last && last.nodeValue.length > 0) {
+    last.nodeValue = last.nodeValue.slice(0, -1);
+    return;
+  }
+  if (container.lastChild) container.removeChild(container.lastChild);
+}
+
+/* =========================
+   Caret save/restore
+========================= */
+function getCaretOffset(root){
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return null;
+  const range = sel.getRangeAt(0);
+  if (!root.contains(range.startContainer)) return null;
+
+  const pre = document.createRange();
+  pre.selectNodeContents(root);
+  pre.setEnd(range.startContainer, range.startOffset);
+  return pre.toString().length;
+}
+
+function setCaretOffset(root, offset){
+  if (offset == null) return;
+  const sel = window.getSelection();
+  if (!sel) return;
+
+  let current = 0;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    const len = node.nodeValue.length;
+    if (current + len >= offset) {
+      const r = document.createRange();
+      r.setStart(node, Math.max(0, offset - current));
+      r.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(r);
+      return;
+    }
+    current += len;
+  }
+}
+
+/* =========================
+   Highlight palette
+========================= */
+const palette = document.getElementById("palette");
+const clearBtn = document.getElementById("clearHl");
+let activeEditor = null;
+
+function selectionInsideEditor(editor){
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return false;
+  const range = sel.getRangeAt(0);
+  return editor.contains(range.commonAncestorContainer) && !sel.isCollapsed;
+}
+
+function maybeShowPalette(editor){
+  if (!selectionInsideEditor(editor)) { hidePalette(); return; }
+  activeEditor = editor;
+
+  const sel = window.getSelection();
+  const rect = sel.getRangeAt(0).getBoundingClientRect();
+
+  const pad = 8;
+  const palW = 250;
+  const left = Math.min(Math.max(rect.left + rect.width/2 - palW/2, pad), window.innerWidth - palW - pad);
+  const top = Math.max(rect.top - 52, pad);
+
+  palette.style.left = `${left}px`;
+  palette.style.top = `${top}px`;
+  palette.style.display = "flex";
+}
+
+function hidePalette(){
+  palette.style.display = "none";
+  activeEditor = null;
+}
+
+function paletteMatchesActiveEditor(){
+  return document.activeElement === palette || palette.contains(document.activeElement);
+}
+
+function applyHighlight(className){
+  if (!activeEditor) return;
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+
+  const range = sel.getRangeAt(0);
+  if (sel.isCollapsed) return;
+  if (!activeEditor.contains(range.commonAncestorContainer)) return;
+
+  const span = document.createElement("span");
+  span.className = `hl ${className}`;
+
+  try{
+    const contents = range.extractContents();
+    span.appendChild(contents);
+    range.insertNode(span);
+
     autoYellowize(activeEditor);
     enforceTwoLines(activeEditor);
 
@@ -683,51 +634,92 @@
     store[key][part][idx] = activeEditor.innerHTML;
     save();
 
+    sel.removeAllRanges();
+    const r = document.createRange();
+    r.setStartAfter(span);
+    r.collapse(true);
+    sel.addRange(r);
+
     hidePalette();
     activeEditor.focus();
-  }
-
-  document.querySelectorAll(".swatch").forEach(sw => {
-    sw.addEventListener("mousedown", (e) => e.preventDefault()); // keep selection
-    sw.addEventListener("click", () => applyHighlight(sw.dataset.class));
-  });
-
-  clearBtn.addEventListener("mousedown", (e) => e.preventDefault());
-  clearBtn.addEventListener("click", clearHighlightInSelection);
-
-  document.addEventListener("mousedown", (e) => {
-    if (palette.contains(e.target)) return;
-    if (e.target.classList && e.target.classList.contains("editor")) return;
+  } catch {
     hidePalette();
+  }
+}
+
+function clearHighlightInSelection(){
+  if (!activeEditor) return;
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+
+  const range = sel.getRangeAt(0);
+  if (sel.isCollapsed) return;
+  if (!activeEditor.contains(range.commonAncestorContainer)) return;
+
+  const spans = activeEditor.querySelectorAll("span.hl");
+  spans.forEach(sp => {
+    const spRange = document.createRange();
+    spRange.selectNodeContents(sp);
+
+    const intersects =
+      range.compareBoundaryPoints(Range.END_TO_START, spRange) < 0 &&
+      range.compareBoundaryPoints(Range.START_TO_END, spRange) > 0;
+
+    if (intersects) {
+      const parent = sp.parentNode;
+      while (sp.firstChild) parent.insertBefore(sp.firstChild, sp);
+      parent.removeChild(sp);
+    }
   });
 
-  window.addEventListener("scroll", () => hidePalette(), { passive:true });
+  autoYellowize(activeEditor);
+  enforceTwoLines(activeEditor);
 
-  function insertTextAtCursor(text){
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return;
-    const range = sel.getRangeAt(0);
-    range.deleteContents();
-    const node = document.createTextNode(text);
-    range.insertNode(node);
-    range.setStartAfter(node);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
+  const key = activeEditor.dataset.dayKey;
+  const part = activeEditor.dataset.part;
+  const idx = Number(activeEditor.dataset.idx);
+  store[key][part][idx] = activeEditor.innerHTML;
+  save();
 
-  // Month nav
-  document.getElementById("prevMonth").onclick=()=>{
-    viewMonth.setMonth(viewMonth.getMonth()-1);
-    renderCalendar();
-  };
-  document.getElementById("nextMonth").onclick=()=>{
-    viewMonth.setMonth(viewMonth.getMonth()+1);
-    renderCalendar();
-  };
+  hidePalette();
+  activeEditor.focus();
+}
 
-  renderCalendar();
-  renderWeek();
+document.querySelectorAll(".swatch").forEach(sw => {
+  sw.addEventListener("mousedown", (e) => e.preventDefault());
+  sw.addEventListener("click", () => applyHighlight(sw.dataset.class));
+});
+clearBtn.addEventListener("mousedown", (e) => e.preventDefault());
+clearBtn.addEventListener("click", clearHighlightInSelection);
+
+document.addEventListener("mousedown", (e) => {
+  if (palette.contains(e.target)) return;
+  if (e.target.classList && e.target.classList.contains("editor")) return;
+  hidePalette();
+});
+window.addEventListener("scroll", () => hidePalette(), { passive:true });
+
+function insertTextAtCursor(text){
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  range.deleteContents();
+  const node = document.createTextNode(text);
+  range.insertNode(node);
+  range.setStartAfter(node);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+/* Month nav */
+document.getElementById("prevMonth").onclick=()=>{ viewMonth.setMonth(viewMonth.getMonth()-1); renderCalendar(); };
+document.getElementById("nextMonth").onclick=()=>{ viewMonth.setMonth(viewMonth.getMonth()+1); renderCalendar(); };
+
+/* init */
+renderCalendar();
+renderWeek();
+fitToScreen();
 </script>
 </body>
 </html>

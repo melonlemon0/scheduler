@@ -20,15 +20,17 @@
     --line: rgba(0,0,0,.06);
     --soft: rgba(0,0,0,.03);
 
-    /* 5 highlight colors (stronger) */
-    --p1: rgba(255, 231, 140, 1);  /* warmer yellow */
-    --p2: rgba(142, 230, 178, 1);  /* stronger mint */
-    --p3: rgba(186, 170, 255, 1);  /* stronger lavender */
-    --p4: rgba(255, 163, 191, 1);  /* stronger pink */
-    --p5: rgba(140, 205, 255, 1);  /* stronger sky */
+    /* dot colors (strong) */
+    --p1: rgba(255, 231, 140, 1);
+    --p2: rgba(142, 230, 178, 1);
+    --p3: rgba(186, 170, 255, 1);
+    --p4: rgba(255, 163, 191, 1);
+    --p5: rgba(140, 205, 255, 1);
 
     --sidebar-w: 380px;
-    --today-yellow: rgba(255, 214, 10, .32);
+
+    /* TODAY bg (grey) */
+    --today-grey: rgba(0,0,0,.07);
   }
 
   html,body{
@@ -106,8 +108,13 @@
   }
   .day:hover{ background:rgba(0,0,0,.04); }
   .day.inactive{ color:#c7c7cc; }
-  .day.today{ background: var(--today-yellow); }
 
+  /* today = grey */
+  .day.today{
+    background: var(--today-grey);
+  }
+
+  /* selected date = blue */
   .day.active{
     background: rgba(0,122,255,1) !important;
     color: #fff !important;
@@ -127,7 +134,6 @@
     border-radius:999px;
     box-shadow: 0 1px 0 rgba(0,0,0,.15);
   }
-  /* make dots visible even on blue selected day */
   .day.active .dot{
     box-shadow: 0 0 0 1px rgba(255,255,255,.65);
   }
@@ -176,6 +182,7 @@
     border-radius:14px;
   }
   .idea-item:hover{ background:var(--soft); }
+
   .handle{
     width:18px;
     height:22px;
@@ -193,7 +200,7 @@
     word-break:break-word;
   }
 
-  /* highlights */
+  /* highlight backgrounds */
   .hl1{ background: rgba(255, 248, 210, 1) !important; }
   .hl2{ background: rgba(206, 245, 219, 1) !important; }
   .hl3{ background: rgba(232, 227, 255, 1) !important; }
@@ -217,11 +224,7 @@
     gap:10px;
   }
   .titlebar .left{ justify-self:start; }
-  .titlebar .center{
-    justify-self:center;
-    text-align:center;
-    min-width:0;
-  }
+  .titlebar .center{ justify-self:center; text-align:center; min-width:0; }
   .titlebar .right{ justify-self:end; }
 
   .week-title{
@@ -281,10 +284,7 @@
   }
 
   .section{ margin-bottom:10px; }
-  .section-emoji{
-    font-size: clamp(14px, 1.6vw, 18px);
-    margin-bottom:6px;
-  }
+  .section-emoji{ font-size: clamp(14px, 1.6vw, 18px); margin-bottom:6px; }
 
   .task{
     position: relative;
@@ -295,14 +295,17 @@
     padding:8px 8px;
     border-radius:14px;
     background:transparent;
+    cursor:default;
   }
   .task:hover{ background:var(--soft); }
 
-  .task:hover .task-handle{ opacity:1; }
-  .task-handle{
-    opacity:0;
-    transition:opacity .12s ease;
+  /* selection state */
+  .selected{
+    background: rgba(0,0,0,.06) !important;
   }
+
+  .task:hover .task-handle{ opacity:1; }
+  .task-handle{ opacity:0; transition:opacity .12s ease; }
 
   .task-body{
     font-size: clamp(12px, 1.15vw, 15px);
@@ -336,19 +339,10 @@
     display:none;
   }
   .task:hover .task-x{ display:block; }
-  .task-x:hover{
-    background: rgba(255,59,48,.14);
-    color: rgba(255,59,48,1);
-  }
+  .task-x:hover{ background: rgba(255,59,48,.14); color: rgba(255,59,48,1); }
 
-  .editing{
-    background: rgba(0,0,0,.04) !important;
-  }
-  .editing .task-body{
-    -webkit-line-clamp: unset;
-    overflow: visible;
-    display:block;
-  }
+  .editing{ background: rgba(0,0,0,.04) !important; }
+  .editing .task-body{ -webkit-line-clamp: unset; overflow: visible; display:block; }
 
   .palette{
     position:fixed;
@@ -467,7 +461,7 @@
 </div>
 
 <script>
-  const KEY = "weekly_notes_stronger_dots_v1";
+  const KEY = "weekly_notes_delete_key_v1";
   const store = safeParse(localStorage.getItem(KEY)) || { days:{}, ideas:[] };
   function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
   const save = () => localStorage.setItem(KEY, JSON.stringify(store));
@@ -532,6 +526,72 @@
     return false;
   }
 
+  /* ===== Selection (for Delete key) ===== */
+  let selected = null; // {type:"task", el:HTMLElement} OR {type:"idea", el:HTMLElement, ideaId:string}
+
+  function clearSelection(){
+    document.querySelectorAll(".selected").forEach(el => el.classList.remove("selected"));
+    selected = null;
+  }
+
+  function selectEl(obj){
+    clearSelection();
+    selected = obj;
+    if(obj?.el) obj.el.classList.add("selected");
+  }
+
+  function isTypingContext(){
+    const ae = document.activeElement;
+    if(!ae) return false;
+    if(ae.tagName === "INPUT" || ae.tagName === "TEXTAREA") return true;
+    // any contenteditable
+    if(ae.isContentEditable) return true;
+    return false;
+  }
+
+  function deleteSelected(){
+    if(!selected) return;
+
+    if(selected.type === "task"){
+      const task = selected.el;
+      // don't delete if editing
+      if(task.classList.contains("editing")) return;
+      clearTask(task);
+      clearSelection();
+      hidePalette();
+      return;
+    }
+
+    if(selected.type === "idea"){
+      removeIdea(selected.ideaId);
+      clearSelection();
+      hidePalette();
+      return;
+    }
+  }
+
+  // Global key handler: Delete / Backspace
+  document.addEventListener("keydown", (e) => {
+    if(e.key !== "Delete" && e.key !== "Backspace") return;
+    // if typing in input or editing task, do not hijack
+    if(isTypingContext()) return;
+    if(!selected) return;
+    e.preventDefault();
+    deleteSelected();
+  });
+
+  // click anywhere empty clears selection
+  document.addEventListener("mousedown", (e) => {
+    const isTask = e.target.closest && e.target.closest(".task");
+    const isIdea = e.target.closest && e.target.closest(".idea-item");
+    const isPalette = palette.contains(e.target);
+    const isHandle = e.target.closest && (e.target.closest(".task-handle") || e.target.closest(".idea-item .handle"));
+    const isX = e.target.closest && e.target.closest(".task-x");
+    if(isPalette || isHandle || isX) return;
+    if(!isTask && !isIdea) clearSelection();
+  });
+
+  /* ===== Calendar ===== */
   const calendar = document.getElementById("calendar");
   const monthLabel = document.getElementById("monthLabel");
 
@@ -580,7 +640,7 @@
       if(key===ymd(today)) div.classList.add("today");
       if(key===ymd(active)) div.classList.add("active");
 
-      div.onclick = ()=>{ active=new Date(d); renderCalendar(); renderWeek(); hidePalette(); };
+      div.onclick = ()=>{ active=new Date(d); renderCalendar(); renderWeek(); hidePalette(); clearSelection(); };
       calendar.appendChild(div);
     }
   }
@@ -635,15 +695,25 @@
       text.textContent = idea.text;
       item.appendChild(text);
 
-      item.addEventListener("dblclick", () => removeIdea(idea.id));
+      // CLICK selects (so Delete key works)
+      item.addEventListener("mousedown", (e)=>{
+        if(e.target.closest(".handle")) return;
+        selectEl({ type:"idea", el:item, ideaId: idea.id });
+      });
 
+      // dblclick = delete
+      item.addEventListener("dblclick", () => { removeIdea(idea.id); clearSelection(); });
+
+      // palette via dots
       handle.addEventListener("mousedown", (e)=>e.preventDefault());
       handle.addEventListener("click", (e)=>{
         e.stopPropagation();
+        selectEl({ type:"idea", el:item, ideaId: idea.id });
         setActiveTarget({ type:"idea", ideaId: idea.id, el: item });
         showPaletteNear(item);
       });
 
+      // drag idea -> tasks
       item.addEventListener("dragstart", (e) => {
         item.classList.add("dragging");
         e.dataTransfer.effectAllowed = "move";
@@ -654,40 +724,10 @@
         document.querySelectorAll(".drop-target").forEach(el => el.classList.remove("drop-target"));
       });
 
-      item.addEventListener("dragover", (e)=>{ e.preventDefault(); item.classList.add("drop-target"); });
-      item.addEventListener("dragleave", ()=> item.classList.remove("drop-target"));
-      item.addEventListener("drop", (e)=>{
-        e.preventDefault();
-        item.classList.remove("drop-target");
-        hidePalette();
-
-        let payloadDrag;
-        try { payloadDrag = JSON.parse(e.dataTransfer.getData("text/plain")); }
-        catch { return; }
-
-        if(payloadDrag.type !== "task") return;
-
-        const from = payloadDrag.from;
-        ensureDay(from.dayKey);
-
-        const src = store.days[from.dayKey][from.part][from.idx];
-        if(!src) return;
-
-        const plain = htmlToPlain(src.t || "").trim();
-        if(plain){
-          store.ideas.unshift({ id: newId(), text: plain, hl: src.hl || "" });
-        }
-        store.days[from.dayKey][from.part][from.idx] = null;
-
-        save();
-        renderIdeas();
-        renderWeek();
-        renderCalendar();
-      });
-
       ideaList.appendChild(item);
     }
 
+    // allow dropping tasks into ideas list area
     ideaList.ondragover = (e)=>{ e.preventDefault(); };
     ideaList.ondrop = (e)=>{
       e.preventDefault();
@@ -715,7 +755,7 @@
     };
   }
 
-  // IME fix
+  // IME fix (Korean)
   let ideaComposing = false;
   ideaInput.addEventListener("compositionstart", () => { ideaComposing = true; });
   ideaInput.addEventListener("compositionend", () => { ideaComposing = false; });
@@ -791,6 +831,12 @@
           body.innerHTML = payload ? (payload.t || "") : "";
           task.appendChild(body);
 
+          // CLICK selects (so Delete key works)
+          task.addEventListener("mousedown", (e)=>{
+            if(e.target.closest(".task-handle") || e.target.closest(".task-x")) return;
+            selectEl({ type:"task", el: task });
+          });
+
           const xbtn = document.createElement("button");
           xbtn.className = "task-x";
           xbtn.type = "button";
@@ -800,20 +846,25 @@
           xbtn.addEventListener("click", (e) => {
             e.stopPropagation();
             clearTask(task);
+            clearSelection();
             hidePalette();
           });
           task.appendChild(xbtn);
 
+          // palette via dots only
           handle.addEventListener("mousedown", (e) => e.preventDefault());
           handle.addEventListener("click", (e) => {
             e.stopPropagation();
             if(task.classList.contains("editing")) return;
+            selectEl({ type:"task", el: task });
             setActiveTarget({ type:"task", taskEl: task });
             showPaletteNear(task);
           });
 
+          // double click edit
           task.addEventListener("dblclick", (e) => {
             e.preventDefault();
+            selectEl({ type:"task", el: task });
             setActiveTarget({ type:"task", taskEl: task });
             enterEditMode(task);
           });
@@ -835,9 +886,13 @@
 
           body.addEventListener("blur", () => exitEditMode(task));
           body.addEventListener("keydown", (e) => {
-            if(e.key === "Escape"){ e.preventDefault(); body.blur(); }
+            if(e.key === "Escape"){
+              e.preventDefault();
+              body.blur();
+            }
           });
 
+          // drop target
           task.addEventListener("dragover", (e) => {
             e.preventDefault();
             task.classList.add("drop-target");
@@ -896,6 +951,7 @@
             }
           });
 
+          // drag start
           task.addEventListener("dragstart", (e) => {
             if(task.classList.contains("editing")) { e.preventDefault(); return; }
             const sel = window.getSelection();
@@ -1028,16 +1084,12 @@
   document.getElementById("prevWeek").onclick = () => {
     active = addDays(active, -7);
     viewMonth = new Date(active.getFullYear(), active.getMonth(), 1);
-    renderCalendar();
-    renderWeek();
-    hidePalette();
+    renderCalendar(); renderWeek(); hidePalette(); clearSelection();
   };
   document.getElementById("nextWeek").onclick = () => {
     active = addDays(active, +7);
     viewMonth = new Date(active.getFullYear(), active.getMonth(), 1);
-    renderCalendar();
-    renderWeek();
-    hidePalette();
+    renderCalendar(); renderWeek(); hidePalette(); clearSelection();
   };
 
   /* ===== Helpers ===== */
@@ -1046,11 +1098,13 @@
     div.innerHTML = html || "";
     return (div.textContent || div.innerText || "").replace(/\u00A0/g," ");
   }
+
   function escapeHTML(str){
     return str.replace(/[&<>"']/g, (ch) => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
     }[ch]));
   }
+
   function insertTextAtCursor(text){
     const sel = window.getSelection();
     if(!sel || sel.rangeCount === 0) return;
@@ -1063,6 +1117,7 @@
     sel.removeAllRanges();
     sel.addRange(range);
   }
+
   function placeCaretAtEnd(el){
     const range = document.createRange();
     range.selectNodeContents(el);
@@ -1072,6 +1127,7 @@
     sel.addRange(range);
   }
 
+  /* ===== Init ===== */
   renderCalendar();
   renderIdeas();
   renderWeek();

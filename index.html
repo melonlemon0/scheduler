@@ -20,12 +20,12 @@
     --line: rgba(0,0,0,.06);
     --soft: rgba(0,0,0,.03);
 
-    /* 5 highlight colors */
-    --p1: rgba(255, 243, 199, .95);
-    --p2: rgba(208, 244, 222, .95);
-    --p3: rgba(221, 214, 255, .95);
-    --p4: rgba(255, 214, 226, .95);
-    --p5: rgba(207, 235, 255, .95);
+    /* 5 highlight colors (stronger) */
+    --p1: rgba(255, 231, 140, 1);  /* warmer yellow */
+    --p2: rgba(142, 230, 178, 1);  /* stronger mint */
+    --p3: rgba(186, 170, 255, 1);  /* stronger lavender */
+    --p4: rgba(255, 163, 191, 1);  /* stronger pink */
+    --p5: rgba(140, 205, 255, 1);  /* stronger sky */
 
     --sidebar-w: 380px;
     --today-yellow: rgba(255, 214, 10, .32);
@@ -58,7 +58,6 @@
     min-width: var(--sidebar-w);
   }
 
-  /* Calendar header */
   .sidebar-header{
     display:flex;
     justify-content:space-between;
@@ -81,7 +80,6 @@
   }
   .navbtn:hover{ background:rgba(0,0,0,.06); }
 
-  /* Month calendar */
   .dow,.calendar{
     display:grid;
     grid-template-columns:repeat(7,1fr);
@@ -108,29 +106,30 @@
   }
   .day:hover{ background:rgba(0,0,0,.04); }
   .day.inactive{ color:#c7c7cc; }
+  .day.today{ background: var(--today-yellow); }
 
-  /* today = yellow */
-  .day.today{
-    background: var(--today-yellow);
-  }
-
-  /* selected = blue */
   .day.active{
     background: rgba(0,122,255,1) !important;
     color: #fff !important;
   }
 
+  /* Dots stronger + bigger + slight shadow */
   .dots{
     display:flex;
-    gap:5px;
-    height:8px;
+    gap:6px;
+    height:10px;
     align-items:center;
     justify-content:center;
   }
   .dot{
-    width:6px;
-    height:6px;
+    width:8px;
+    height:8px;
     border-radius:999px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.15);
+  }
+  /* make dots visible even on blue selected day */
+  .day.active .dot{
+    box-shadow: 0 0 0 1px rgba(255,255,255,.65);
   }
 
   /* ===== Ideas ===== */
@@ -195,11 +194,11 @@
   }
 
   /* highlights */
-  .hl1{ background: var(--p1) !important; }
-  .hl2{ background: var(--p2) !important; }
-  .hl3{ background: var(--p3) !important; }
-  .hl4{ background: var(--p4) !important; }
-  .hl5{ background: var(--p5) !important; }
+  .hl1{ background: rgba(255, 248, 210, 1) !important; }
+  .hl2{ background: rgba(206, 245, 219, 1) !important; }
+  .hl3{ background: rgba(232, 227, 255, 1) !important; }
+  .hl4{ background: rgba(255, 223, 233, 1) !important; }
+  .hl5{ background: rgba(213, 238, 255, 1) !important; }
 
   /* ===== Main ===== */
   .main{
@@ -211,7 +210,6 @@
     gap:10px;
   }
 
-  /* Weekly title with week switch buttons on left/right */
   .titlebar{
     display:grid;
     grid-template-columns: 1fr auto 1fr;
@@ -242,7 +240,6 @@
     text-align:center;
   }
 
-  /* Week grid Mon–Sat */
   .week{
     flex:1 1 auto;
     min-height:0;
@@ -289,7 +286,6 @@
     margin-bottom:6px;
   }
 
-  /* Task block */
   .task{
     position: relative;
     display:grid;
@@ -354,7 +350,6 @@
     display:block;
   }
 
-  /* Palette */
   .palette{
     position:fixed;
     z-index:9999;
@@ -387,13 +382,12 @@
     border-radius:999px;
     background: rgba(0,0,0,.05);
   }
-  .sw1{ background: var(--p1); }
-  .sw2{ background: var(--p2); }
-  .sw3{ background: var(--p3); }
-  .sw4{ background: var(--p4); }
-  .sw5{ background: var(--p5); }
+  .sw1{ background: rgba(255, 248, 210, 1); }
+  .sw2{ background: rgba(206, 245, 219, 1); }
+  .sw3{ background: rgba(232, 227, 255, 1); }
+  .sw4{ background: rgba(255, 223, 233, 1); }
+  .sw5{ background: rgba(213, 238, 255, 1); }
 
-  /* drag visuals */
   .dragging{ opacity:.55; }
   .drop-target{ background: rgba(0,0,0,.06) !important; }
 
@@ -443,8 +437,6 @@
   </aside>
 
   <main class="main">
-
-    <!-- week buttons on left/right of title -->
     <div class="titlebar">
       <div class="left">
         <button class="navbtn" id="prevWeek" aria-label="Previous week">‹</button>
@@ -465,7 +457,6 @@
 
 </div>
 
-<!-- Palette -->
 <div class="palette" id="palette" role="dialog" aria-label="Highlight colors">
   <div class="swatch sw0" data-hl="" title="None"></div>
   <div class="swatch sw1" data-hl="hl1" title="Highlight 1"></div>
@@ -476,8 +467,7 @@
 </div>
 
 <script>
-  /* ===== Storage ===== */
-  const KEY = "weekly_notes_weektitle_nav_v1";
+  const KEY = "weekly_notes_stronger_dots_v1";
   const store = safeParse(localStorage.getItem(KEY)) || { days:{}, ideas:[] };
   function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
   const save = () => localStorage.setItem(KEY, JSON.stringify(store));
@@ -500,7 +490,6 @@
     }
   }
 
-  /* ===== Date helpers ===== */
   const today = new Date(); today.setHours(0,0,0,0);
   let active = new Date(today);
   let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -543,7 +532,6 @@
     return false;
   }
 
-  /* ===== Calendar ===== */
   const calendar = document.getElementById("calendar");
   const monthLabel = document.getElementById("monthLabel");
 
@@ -564,7 +552,6 @@
       num.textContent = d.getDate();
       div.appendChild(num);
 
-      // dots: show ONLY if there is something; each dot only if that section's first slot has something
       if(dayHasAnything(key)){
         const dots = document.createElement("div");
         dots.className = "dots";
@@ -572,7 +559,7 @@
         const mkDot = (part)=>{
           if(!slotHasTextOrColor(key, part, 0)) return null;
           const c = hlToDotColor(store.days[key][part][0]?.hl || "");
-          if(!c) return null; // if no color, no dot (your rule)
+          if(!c) return null; // no color => no dot
           const dot = document.createElement("div");
           dot.className = "dot";
           dot.style.background = c;
@@ -648,10 +635,8 @@
       text.textContent = idea.text;
       item.appendChild(text);
 
-      // dblclick = delete
       item.addEventListener("dblclick", () => removeIdea(idea.id));
 
-      // palette for ideas via dots
       handle.addEventListener("mousedown", (e)=>e.preventDefault());
       handle.addEventListener("click", (e)=>{
         e.stopPropagation();
@@ -659,7 +644,6 @@
         showPaletteNear(item);
       });
 
-      // drag idea -> tasks
       item.addEventListener("dragstart", (e) => {
         item.classList.add("dragging");
         e.dataTransfer.effectAllowed = "move";
@@ -670,7 +654,6 @@
         document.querySelectorAll(".drop-target").forEach(el => el.classList.remove("drop-target"));
       });
 
-      // drop task onto ideas list area (move task -> new idea)
       item.addEventListener("dragover", (e)=>{ e.preventDefault(); item.classList.add("drop-target"); });
       item.addEventListener("dragleave", ()=> item.classList.remove("drop-target"));
       item.addEventListener("drop", (e)=>{
@@ -705,7 +688,6 @@
       ideaList.appendChild(item);
     }
 
-    // Also allow dropping tasks into the empty space of the ideas list (not just onto an item)
     ideaList.ondragover = (e)=>{ e.preventDefault(); };
     ideaList.ondrop = (e)=>{
       e.preventDefault();
@@ -733,7 +715,7 @@
     };
   }
 
-  // IME fix (Korean)
+  // IME fix
   let ideaComposing = false;
   ideaInput.addEventListener("compositionstart", () => { ideaComposing = true; });
   ideaInput.addEventListener("compositionend", () => { ideaComposing = false; });
@@ -754,7 +736,7 @@
   function renderWeek(){
     weekEl.innerHTML = "";
 
-    const start = startOfWeek(active); // Sunday
+    const start = startOfWeek(active);
     const monday = addDays(start, 1);
     const saturday = addDays(start, 6);
 
@@ -822,7 +804,6 @@
           });
           task.appendChild(xbtn);
 
-          // palette via dots only
           handle.addEventListener("mousedown", (e) => e.preventDefault());
           handle.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -831,7 +812,6 @@
             showPaletteNear(task);
           });
 
-          // double click edit
           task.addEventListener("dblclick", (e) => {
             e.preventDefault();
             setActiveTarget({ type:"task", taskEl: task });
@@ -855,13 +835,9 @@
 
           body.addEventListener("blur", () => exitEditMode(task));
           body.addEventListener("keydown", (e) => {
-            if(e.key === "Escape"){
-              e.preventDefault();
-              body.blur();
-            }
+            if(e.key === "Escape"){ e.preventDefault(); body.blur(); }
           });
 
-          // drop target
           task.addEventListener("dragover", (e) => {
             e.preventDefault();
             task.classList.add("drop-target");
@@ -920,7 +896,6 @@
             }
           });
 
-          // drag start (task -> task OR task -> ideas)
           task.addEventListener("dragstart", (e) => {
             if(task.classList.contains("editing")) { e.preventDefault(); return; }
             const sel = window.getSelection();
@@ -952,7 +927,7 @@
     save();
   }
 
-  /* ===== Palette (for BOTH tasks and ideas) ===== */
+  /* ===== Palette ===== */
   const palette = document.getElementById("palette");
   let activeTarget = null;
 
@@ -1031,7 +1006,6 @@
     sw.addEventListener("click", () => {
       if(!activeTarget) return;
       const hl = sw.dataset.hl || "";
-
       if(activeTarget.type === "task"){
         setTaskHighlight(activeTarget.taskEl, hl);
       } else if(activeTarget.type === "idea"){
@@ -1047,17 +1021,10 @@
     hidePalette();
   });
 
-  /* ===== Month nav ===== */
-  document.getElementById("prevMonth").onclick = () => {
-    viewMonth.setMonth(viewMonth.getMonth()-1);
-    renderCalendar();
-  };
-  document.getElementById("nextMonth").onclick = () => {
-    viewMonth.setMonth(viewMonth.getMonth()+1);
-    renderCalendar();
-  };
+  /* ===== Nav ===== */
+  document.getElementById("prevMonth").onclick = () => { viewMonth.setMonth(viewMonth.getMonth()-1); renderCalendar(); };
+  document.getElementById("nextMonth").onclick = () => { viewMonth.setMonth(viewMonth.getMonth()+1); renderCalendar(); };
 
-  /* ===== Week nav (buttons around title) ===== */
   document.getElementById("prevWeek").onclick = () => {
     active = addDays(active, -7);
     viewMonth = new Date(active.getFullYear(), active.getMonth(), 1);
@@ -1079,13 +1046,11 @@
     div.innerHTML = html || "";
     return (div.textContent || div.innerText || "").replace(/\u00A0/g," ");
   }
-
   function escapeHTML(str){
     return str.replace(/[&<>"']/g, (ch) => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
     }[ch]));
   }
-
   function insertTextAtCursor(text){
     const sel = window.getSelection();
     if(!sel || sel.rangeCount === 0) return;
@@ -1098,7 +1063,6 @@
     sel.removeAllRanges();
     sel.addRange(range);
   }
-
   function placeCaretAtEnd(el){
     const range = document.createRange();
     range.selectNodeContents(el);
@@ -1108,7 +1072,6 @@
     sel.addRange(range);
   }
 
-  /* ===== Initialize ===== */
   renderCalendar();
   renderIdeas();
   renderWeek();

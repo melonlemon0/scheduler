@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Weekly Notes</title>
 
-<!-- Noto Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -20,7 +19,6 @@
     --line: rgba(0,0,0,.06);
     --soft: rgba(0,0,0,.03);
 
-    /* dot colors (strong) */
     --p1: rgba(255, 231, 140, 1);
     --p2: rgba(142, 230, 178, 1);
     --p3: rgba(186, 170, 255, 1);
@@ -28,8 +26,6 @@
     --p5: rgba(140, 205, 255, 1);
 
     --sidebar-w: 380px;
-
-    /* TODAY bg (grey) */
     --today-grey: rgba(0,0,0,.07);
   }
 
@@ -42,6 +38,13 @@
     overflow:hidden;
   }
 
+  /* ✅ remove browser focus outlines (blue border) */
+  :focus { outline: none !important; }
+  :focus-visible { outline: none !important; }
+  .task *:focus { outline: none !important; }
+  .idea-item *:focus { outline: none !important; }
+  .navbtn:focus, .navbtn:focus-visible { outline:none !important; box-shadow:none !important; }
+
   .app{
     height:100vh;
     display:grid;
@@ -49,7 +52,6 @@
     overflow:hidden;
   }
 
-  /* ===== Sidebar ===== */
   .sidebar{
     border-right:1px solid var(--line);
     padding:16px 16px;
@@ -108,19 +110,13 @@
   }
   .day:hover{ background:rgba(0,0,0,.04); }
   .day.inactive{ color:#c7c7cc; }
+  .day.today{ background: var(--today-grey); }
 
-  /* today = grey */
-  .day.today{
-    background: var(--today-grey);
-  }
-
-  /* selected date = blue */
   .day.active{
     background: rgba(0,122,255,1) !important;
     color: #fff !important;
   }
 
-  /* Dots stronger + bigger + slight shadow */
   .dots{
     display:flex;
     gap:6px;
@@ -138,7 +134,7 @@
     box-shadow: 0 0 0 1px rgba(255,255,255,.65);
   }
 
-  /* ===== Ideas ===== */
+  /* Ideas */
   .ideas{
     flex:1 1 auto;
     min-height:0;
@@ -180,6 +176,7 @@
     align-items:start;
     padding:9px 9px;
     border-radius:14px;
+    cursor:default;
   }
   .idea-item:hover{ background:var(--soft); }
 
@@ -198,16 +195,17 @@
     line-height:1.35;
     white-space:pre-wrap;
     word-break:break-word;
+    user-select:text;
   }
 
-  /* highlight backgrounds */
+  /* Highlights */
   .hl1{ background: rgba(255, 248, 210, 1) !important; }
   .hl2{ background: rgba(206, 245, 219, 1) !important; }
   .hl3{ background: rgba(232, 227, 255, 1) !important; }
   .hl4{ background: rgba(255, 223, 233, 1) !important; }
   .hl5{ background: rgba(213, 238, 255, 1) !important; }
 
-  /* ===== Main ===== */
+  /* Main */
   .main{
     padding:16px 16px;
     overflow:hidden;
@@ -299,10 +297,7 @@
   }
   .task:hover{ background:var(--soft); }
 
-  /* selection state */
-  .selected{
-    background: rgba(0,0,0,.06) !important;
-  }
+  .selected{ background: rgba(0,0,0,.06) !important; }
 
   .task:hover .task-handle{ opacity:1; }
   .task-handle{ opacity:0; transition:opacity .12s ease; }
@@ -315,6 +310,7 @@
     outline:none;
     min-height:2.1em;
     font-family: inherit;
+    user-select:text;
 
     overflow:hidden;
     display:-webkit-box;
@@ -342,7 +338,14 @@
   .task-x:hover{ background: rgba(255,59,48,.14); color: rgba(255,59,48,1); }
 
   .editing{ background: rgba(0,0,0,.04) !important; }
-  .editing .task-body{ -webkit-line-clamp: unset; overflow: visible; display:block; }
+  .editing .task-body{
+    -webkit-line-clamp: unset;
+    overflow: visible;
+    display:block;
+  }
+
+  /* ✅ remove keyboard focus ring styling (no blue outline) */
+  .kbfocus{ outline:none !important; }
 
   .palette{
     position:fixed;
@@ -400,7 +403,6 @@
 
 <body>
 <div class="app">
-
   <aside class="sidebar">
     <div class="calendar-wrap">
       <div class="sidebar-header">
@@ -448,7 +450,6 @@
 
     <div class="week" id="week"></div>
   </main>
-
 </div>
 
 <div class="palette" id="palette" role="dialog" aria-label="Highlight colors">
@@ -461,7 +462,7 @@
 </div>
 
 <script>
-  const KEY = "weekly_notes_delete_key_v1";
+  const KEY = "weekly_notes_no_blue_focus_v1";
   const store = safeParse(localStorage.getItem(KEY)) || { days:{}, ideas:[] };
   function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
   const save = () => localStorage.setItem(KEY, JSON.stringify(store));
@@ -469,10 +470,12 @@
   if(!Array.isArray(store.ideas)) store.ideas = [];
 
   const SLOTS = 3;
+  const PARTS = ["m","a","e"];
+  const DAY_OFFSETS = [1,2,3,4,5,6]; // Mon..Sat
 
   function ensureDay(k){
     if(!store.days[k]) store.days[k] = { m:Array(SLOTS).fill(null), a:Array(SLOTS).fill(null), e:Array(SLOTS).fill(null) };
-    for(const part of ["m","a","e"]){
+    for(const part of PARTS){
       if(!Array.isArray(store.days[k][part])) store.days[k][part] = Array(SLOTS).fill(null);
       store.days[k][part] = store.days[k][part].slice(0,SLOTS);
       while(store.days[k][part].length < SLOTS) store.days[k][part].push(null);
@@ -509,6 +512,40 @@
     }
   }
 
+  function htmlToPlain(html){
+    const div = document.createElement("div");
+    div.innerHTML = html || "";
+    return (div.textContent || div.innerText || "").replace(/\u00A0/g," ");
+  }
+
+  function escapeHTML(str){
+    return str.replace(/[&<>"']/g, (ch) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[ch]));
+  }
+
+  function insertTextAtCursor(text){
+    const sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const node = document.createTextNode(text);
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function placeCaretAtEnd(el){
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
   function slotHasTextOrColor(dayKey, part, idx){
     ensureDay(dayKey);
     const v = store.days[dayKey][part][idx];
@@ -518,7 +555,7 @@
   }
 
   function dayHasAnything(dayKey){
-    for(const p of ["m","a","e"]){
+    for(const p of PARTS){
       for(let i=0;i<SLOTS;i++){
         if(slotHasTextOrColor(dayKey,p,i)) return true;
       }
@@ -526,14 +563,12 @@
     return false;
   }
 
-  /* ===== Selection (for Delete key) ===== */
-  let selected = null; // {type:"task", el:HTMLElement} OR {type:"idea", el:HTMLElement, ideaId:string}
-
+  /* ===== Selection ===== */
+  let selected = null; // {type:"task", el} OR {type:"idea", el, ideaId}
   function clearSelection(){
     document.querySelectorAll(".selected").forEach(el => el.classList.remove("selected"));
     selected = null;
   }
-
   function selectEl(obj){
     clearSelection();
     selected = obj;
@@ -544,43 +579,116 @@
     const ae = document.activeElement;
     if(!ae) return false;
     if(ae.tagName === "INPUT" || ae.tagName === "TEXTAREA") return true;
-    // any contenteditable
     if(ae.isContentEditable) return true;
     return false;
   }
 
-  function deleteSelected(){
-    if(!selected) return;
+  /* ===== Arrow key navigation (no focus ring) ===== */
+  const DAY_OFFSETS_ARR = [1,2,3,4,5,6];
 
-    if(selected.type === "task"){
-      const task = selected.el;
-      // don't delete if editing
-      if(task.classList.contains("editing")) return;
-      clearTask(task);
-      clearSelection();
-      hidePalette();
+  function getWeekDayKeys(){
+    const start = startOfWeek(active);
+    return DAY_OFFSETS_ARR.map(off => ymd(addDays(start, off)));
+  }
+
+  function getTaskElByMeta(dayKey, part, idx){
+    return document.querySelector(`.task[data-day-key="${dayKey}"][data-part="${part}"][data-idx="${idx}"]`);
+  }
+
+  function taskIndexInDay(part, idx){
+    const partBase = (part === "m") ? 0 : (part === "a") ? 3 : 6;
+    return partBase + idx;
+  }
+
+  function indexToPartIdx(n){
+    if(n <= 2) return { part:"m", idx:n };
+    if(n <= 5) return { part:"a", idx:n-3 };
+    return { part:"e", idx:n-6 };
+  }
+
+  function moveFocusByArrows(key){
+    if(!selected || selected.type !== "task"){
+      const weekKeys = getWeekDayKeys();
+      const el = getTaskElByMeta(weekKeys[0], "m", 0);
+      if(el) selectEl({ type:"task", el });
       return;
     }
 
-    if(selected.type === "idea"){
-      removeIdea(selected.ideaId);
-      clearSelection();
-      hidePalette();
-      return;
+    const curEl = selected.el;
+    const meta = { dayKey: curEl.dataset.dayKey, part: curEl.dataset.part, idx: Number(curEl.dataset.idx) };
+    const weekKeys = getWeekDayKeys();
+    const dayIdx = weekKeys.indexOf(meta.dayKey);
+    const slotIdx = taskIndexInDay(meta.part, meta.idx);
+
+    let nextDayIdx = dayIdx;
+    let nextSlotIdx = slotIdx;
+
+    if(key === "ArrowLeft") nextDayIdx = Math.max(0, dayIdx - 1);
+    if(key === "ArrowRight") nextDayIdx = Math.min(weekKeys.length - 1, dayIdx + 1);
+    if(key === "ArrowUp") nextSlotIdx = Math.max(0, slotIdx - 1);
+    if(key === "ArrowDown") nextSlotIdx = Math.min(8, slotIdx + 1);
+
+    const { part, idx } = indexToPartIdx(nextSlotIdx);
+    const nextEl = getTaskElByMeta(weekKeys[nextDayIdx], part, idx);
+    if(nextEl){
+      selectEl({ type:"task", el: nextEl });
+      nextEl.scrollIntoView({ block:"nearest", inline:"nearest" });
     }
   }
 
-  // Global key handler: Delete / Backspace
+  function enterEditMode(task){
+    document.querySelectorAll(".task.editing").forEach(t => exitEditMode(t));
+    hidePalette();
+    task.classList.add("editing");
+    const body = task.querySelector(".task-body");
+    body.contentEditable = "true";
+    body.focus();
+    placeCaretAtEnd(body);
+  }
+
+  function exitEditMode(task){
+    if(!task.classList.contains("editing")) return;
+    const body = task.querySelector(".task-body");
+    body.contentEditable = "false";
+    task.classList.remove("editing");
+  }
+
   document.addEventListener("keydown", (e) => {
-    if(e.key !== "Delete" && e.key !== "Backspace") return;
-    // if typing in input or editing task, do not hijack
     if(isTypingContext()) return;
-    if(!selected) return;
-    e.preventDefault();
-    deleteSelected();
+
+    const keys = ["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"];
+    if(keys.includes(e.key)){
+      e.preventDefault();
+      moveFocusByArrows(e.key);
+      return;
+    }
+
+    if(e.key === "Enter" && selected && selected.type === "task"){
+      e.preventDefault();
+      enterEditMode(selected.el);
+      return;
+    }
   });
 
-  // click anywhere empty clears selection
+  /* delete selected */
+  document.addEventListener("keydown", (e) => {
+    if((e.key === "Delete" || e.key === "Backspace") && !isTypingContext() && selected){
+      e.preventDefault();
+      if(selected.type === "task"){
+        const task = selected.el;
+        if(task.classList.contains("editing")) return;
+        clearTask(task);
+        clearSelection();
+        hidePalette();
+      } else if(selected.type === "idea"){
+        removeIdea(selected.ideaId);
+        clearSelection();
+        hidePalette();
+      }
+    }
+  });
+
+  /* click empty clears selection */
   document.addEventListener("mousedown", (e) => {
     const isTask = e.target.closest && e.target.closest(".task");
     const isIdea = e.target.closest && e.target.closest(".idea-item");
@@ -589,6 +697,93 @@
     const isX = e.target.closest && e.target.closest(".task-x");
     if(isPalette || isHandle || isX) return;
     if(!isTask && !isIdea) clearSelection();
+  });
+
+  /* ===== Copy / Paste with color ===== */
+  async function writeClipboardPayload(payload){
+    const txt = JSON.stringify(payload);
+    try{
+      await navigator.clipboard.writeText(txt);
+    }catch{
+      const ta = document.createElement("textarea");
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
+    }
+  }
+
+  async function readClipboardPayload(){
+    let txt = "";
+    try{
+      txt = await navigator.clipboard.readText();
+    }catch{
+      return null;
+    }
+    if(!txt) return null;
+
+    if(txt.trim().startsWith("{") && txt.includes('"hl"') && txt.includes('"text"')){
+      try{ return JSON.parse(txt); }catch{ }
+    }
+    return { kind:"plain", text: txt, hl:"" };
+  }
+
+  document.addEventListener("keydown", async (e) => {
+    const mod = e.metaKey || e.ctrlKey;
+    if(!mod) return;
+
+    if(e.key.toLowerCase() === "c"){
+      if(isTypingContext()) return;
+      if(!selected) return;
+      e.preventDefault();
+
+      if(selected.type === "task"){
+        const p = getTaskPayload(selected.el) || { t:"", hl:"" };
+        const text = htmlToPlain(p.t || "").trim();
+        if(!text && !p.hl) return;
+        await writeClipboardPayload({ kind:"task", text, hl: p.hl || "" });
+        return;
+      }
+
+      if(selected.type === "idea"){
+        const idea = getIdeaById(selected.ideaId);
+        if(!idea) return;
+        const text = (idea.text || "").trim();
+        if(!text && !idea.hl) return;
+        await writeClipboardPayload({ kind:"idea", text, hl: idea.hl || "" });
+        return;
+      }
+    }
+
+    if(e.key.toLowerCase() === "v"){
+      if(isTypingContext()) return;
+      if(!selected) return;
+
+      const payload = await readClipboardPayload();
+      if(!payload || !payload.text) return;
+
+      e.preventDefault();
+      const clipText = String(payload.text || "");
+      const clipHL = String(payload.hl || "");
+
+      if(selected.type === "task"){
+        const task = selected.el;
+        const cur = getTaskPayload(task) || { t:"", hl:"" };
+        const insert = escapeHTML(clipText).replace(/\n/g,"<br>");
+        const nextText = (cur.t && htmlToPlain(cur.t).trim()) ? (cur.t + "<br>" + insert) : insert;
+        const nextHL = cur.hl || clipHL || "";
+        storeWriteTask(task, nextText, nextHL);
+        renderWeek();
+        renderCalendar();
+        return;
+      }
+
+      if(selected.type === "idea"){
+        addIdea(clipText, clipHL);
+        return;
+      }
+    }
   });
 
   /* ===== Calendar ===== */
@@ -619,7 +814,7 @@
         const mkDot = (part)=>{
           if(!slotHasTextOrColor(key, part, 0)) return null;
           const c = hlToDotColor(store.days[key][part][0]?.hl || "");
-          if(!c) return null; // no color => no dot
+          if(!c) return null;
           const dot = document.createElement("div");
           dot.className = "dot";
           dot.style.background = c;
@@ -632,7 +827,6 @@
         if(d1) dots.appendChild(d1);
         if(d2) dots.appendChild(d2);
         if(d3) dots.appendChild(d3);
-
         if(dots.childElementCount > 0) div.appendChild(dots);
       }
 
@@ -653,10 +847,14 @@
     return Math.random().toString(16).slice(2) + Date.now().toString(16);
   }
 
+  function getIdeaById(id){
+    return store.ideas.find(x => x.id === id);
+  }
+
   function addIdea(text, hl=""){
     const t = (text || "").trim();
     if(!t) return;
-    store.ideas.unshift({ id: newId(), text: t, hl });
+    store.ideas.unshift({ id: newId(), text: t, hl: hl || "" });
     ideaInput.value = "";
     save();
     renderIdeas();
@@ -695,16 +893,13 @@
       text.textContent = idea.text;
       item.appendChild(text);
 
-      // CLICK selects (so Delete key works)
       item.addEventListener("mousedown", (e)=>{
         if(e.target.closest(".handle")) return;
         selectEl({ type:"idea", el:item, ideaId: idea.id });
       });
 
-      // dblclick = delete
       item.addEventListener("dblclick", () => { removeIdea(idea.id); clearSelection(); });
 
-      // palette via dots
       handle.addEventListener("mousedown", (e)=>e.preventDefault());
       handle.addEventListener("click", (e)=>{
         e.stopPropagation();
@@ -713,7 +908,6 @@
         showPaletteNear(item);
       });
 
-      // drag idea -> tasks
       item.addEventListener("dragstart", (e) => {
         item.classList.add("dragging");
         e.dataTransfer.effectAllowed = "move";
@@ -727,7 +921,6 @@
       ideaList.appendChild(item);
     }
 
-    // allow dropping tasks into ideas list area
     ideaList.ondragover = (e)=>{ e.preventDefault(); };
     ideaList.ondrop = (e)=>{
       e.preventDefault();
@@ -755,11 +948,9 @@
     };
   }
 
-  // IME fix (Korean)
   let ideaComposing = false;
   ideaInput.addEventListener("compositionstart", () => { ideaComposing = true; });
   ideaInput.addEventListener("compositionend", () => { ideaComposing = false; });
-
   ideaInput.addEventListener("keydown", (e) => {
     if(e.key === "Enter"){
       if (ideaComposing || e.isComposing) return;
@@ -768,14 +959,51 @@
     }
   });
 
-  /* ===== Week ===== */
+  /* ===== Week render ===== */
   const weekEl = document.getElementById("week");
   const weekTitle = document.getElementById("weekTitle");
   const weekRange = document.getElementById("weekRange");
 
+  function getTaskPayload(task){
+    const dayKey = task.dataset.dayKey;
+    const part = task.dataset.part;
+    const idx = Number(task.dataset.idx);
+    ensureDay(dayKey);
+    return store.days[dayKey][part][idx];
+  }
+
+  function storeWriteTask(task, html, hl){
+    const dayKey = task.dataset.dayKey;
+    const part = task.dataset.part;
+    const idx = Number(task.dataset.idx);
+    ensureDay(dayKey);
+    store.days[dayKey][part][idx] = { t: html, hl: hl || "" };
+    save();
+  }
+
+  function writeTaskText(task, html){
+    const dayKey = task.dataset.dayKey;
+    const part = task.dataset.part;
+    const idx = Number(task.dataset.idx);
+    ensureDay(dayKey);
+    const cur = store.days[dayKey][part][idx] || { t:"", hl:"" };
+    store.days[dayKey][part][idx] = { t: html, hl: cur.hl || "" };
+    save();
+  }
+
+  function clearTask(task){
+    const dayKey = task.dataset.dayKey;
+    const part = task.dataset.part;
+    const idx = Number(task.dataset.idx);
+    ensureDay(dayKey);
+    store.days[dayKey][part][idx] = null;
+    save();
+    renderWeek();
+    renderCalendar();
+  }
+
   function renderWeek(){
     weekEl.innerHTML = "";
-
     const start = startOfWeek(active);
     const monday = addDays(start, 1);
     const saturday = addDays(start, 6);
@@ -783,10 +1011,9 @@
     weekTitle.textContent = `${active.toLocaleDateString(undefined,{month:"long"})}, Week ${weekOfMonth(active)}`;
     weekRange.textContent = `${monday.toLocaleDateString()} – ${saturday.toLocaleDateString()}`;
 
-    const offsets = [1,2,3,4,5,6]; // Mon..Sat
     const sections = [["m","☀️"],["a","🌤"],["e","🌙"]];
 
-    offsets.forEach((off)=>{
+    for(const off of DAY_OFFSETS){
       const d = addDays(start, off);
       const dayKey = ymd(d);
       ensureDay(dayKey);
@@ -799,7 +1026,7 @@
       name.innerHTML = `<span>${fmtShortDay(d)}</span><span class="day-date">${fmtMD(d)}</span>`;
       col.appendChild(name);
 
-      sections.forEach(([part,emoji])=>{
+      for(const [part, emoji] of sections){
         const sec = document.createElement("div");
         sec.className = "section";
 
@@ -831,7 +1058,10 @@
           body.innerHTML = payload ? (payload.t || "") : "";
           task.appendChild(body);
 
-          // CLICK selects (so Delete key works)
+          let composing = false;
+          body.addEventListener("compositionstart", ()=>{ composing = true; });
+          body.addEventListener("compositionend", ()=>{ composing = false; });
+
           task.addEventListener("mousedown", (e)=>{
             if(e.target.closest(".task-handle") || e.target.closest(".task-x")) return;
             selectEl({ type:"task", el: task });
@@ -851,7 +1081,6 @@
           });
           task.appendChild(xbtn);
 
-          // palette via dots only
           handle.addEventListener("mousedown", (e) => e.preventDefault());
           handle.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -861,7 +1090,6 @@
             showPaletteNear(task);
           });
 
-          // double click edit
           task.addEventListener("dblclick", (e) => {
             e.preventDefault();
             selectEl({ type:"task", el: task });
@@ -885,14 +1113,23 @@
           });
 
           body.addEventListener("blur", () => exitEditMode(task));
+
           body.addEventListener("keydown", (e) => {
+            if(e.key === "Tab"){
+              if(composing || e.isComposing) return;
+              e.preventDefault();
+              exitEditMode(task);
+              selectEl({ type:"task", el: task });
+              moveFocusByArrows(e.shiftKey ? "ArrowUp" : "ArrowDown");
+              if(selected && selected.type === "task") enterEditMode(selected.el);
+              return;
+            }
             if(e.key === "Escape"){
               e.preventDefault();
               body.blur();
             }
           });
 
-          // drop target
           task.addEventListener("dragover", (e) => {
             e.preventDefault();
             task.classList.add("drop-target");
@@ -951,12 +1188,10 @@
             }
           });
 
-          // drag start
           task.addEventListener("dragstart", (e) => {
             if(task.classList.contains("editing")) { e.preventDefault(); return; }
             const sel = window.getSelection();
             if(sel && !sel.isCollapsed) { e.preventDefault(); return; }
-
             hidePalette();
             task.classList.add("dragging");
             e.dataTransfer.effectAllowed = "move";
@@ -975,11 +1210,10 @@
         }
 
         col.appendChild(sec);
-      });
+      }
 
       weekEl.appendChild(col);
-    });
-
+    }
     save();
   }
 
@@ -988,74 +1222,16 @@
   let activeTarget = null;
 
   function setActiveTarget(t){ activeTarget = t; }
-
   function showPaletteNear(el){
     const rect = el.getBoundingClientRect();
-    const pad = 10;
-    const palW = 210;
+    const pad = 10, palW = 210;
     const left = Math.min(Math.max(rect.left + rect.width/2 - palW/2, pad), window.innerWidth - palW - pad);
     const top = Math.max(rect.top - 54, pad);
-
     palette.style.left = `${left}px`;
     palette.style.top = `${top}px`;
     palette.style.display = "flex";
   }
-
-  function hidePalette(){
-    palette.style.display = "none";
-    activeTarget = null;
-  }
-
-  function getTaskKey(task){
-    return { dayKey: task.dataset.dayKey, part: task.dataset.part, idx: Number(task.dataset.idx) };
-  }
-
-  function writeTaskText(task, html){
-    const {dayKey, part, idx} = getTaskKey(task);
-    ensureDay(dayKey);
-    const cur = store.days[dayKey][part][idx] || { t:"", hl:"" };
-    store.days[dayKey][part][idx] = { t: html, hl: cur.hl || "" };
-    save();
-  }
-
-  function setTaskHighlight(task, hlClass){
-    task.classList.remove("hl1","hl2","hl3","hl4","hl5");
-    if(hlClass) task.classList.add(hlClass);
-
-    const {dayKey, part, idx} = getTaskKey(task);
-    ensureDay(dayKey);
-    const cur = store.days[dayKey][part][idx];
-    const next = cur ? { t: cur.t || "", hl: hlClass } : { t: "", hl: hlClass };
-    store.days[dayKey][part][idx] = next;
-    save();
-    renderCalendar();
-  }
-
-  function clearTask(task){
-    const {dayKey, part, idx} = getTaskKey(task);
-    ensureDay(dayKey);
-    store.days[dayKey][part][idx] = null;
-    save();
-    renderWeek();
-    renderCalendar();
-  }
-
-  function enterEditMode(task){
-    document.querySelectorAll(".task.editing").forEach(t => exitEditMode(t));
-    hidePalette();
-    task.classList.add("editing");
-    const body = task.querySelector(".task-body");
-    body.contentEditable = "true";
-    body.focus();
-    placeCaretAtEnd(body);
-  }
-
-  function exitEditMode(task){
-    if(!task.classList.contains("editing")) return;
-    const body = task.querySelector(".task-body");
-    body.contentEditable = "false";
-    task.classList.remove("editing");
-  }
+  function hidePalette(){ palette.style.display = "none"; activeTarget = null; }
 
   document.querySelectorAll("#palette .swatch").forEach(sw => {
     sw.addEventListener("mousedown", (e) => e.preventDefault());
@@ -1063,11 +1239,16 @@
       if(!activeTarget) return;
       const hl = sw.dataset.hl || "";
       if(activeTarget.type === "task"){
-        setTaskHighlight(activeTarget.taskEl, hl);
+        const task = activeTarget.taskEl;
+        task.classList.remove("hl1","hl2","hl3","hl4","hl5");
+        if(hl) task.classList.add(hl);
+        storeWriteTask(task, (getTaskPayload(task)?.t || ""), hl);
+        renderCalendar();
       } else if(activeTarget.type === "idea"){
         setIdeaHighlight(activeTarget.ideaId, hl);
       }
       hidePalette();
+      renderCalendar();
     });
   });
 
@@ -1091,41 +1272,6 @@
     viewMonth = new Date(active.getFullYear(), active.getMonth(), 1);
     renderCalendar(); renderWeek(); hidePalette(); clearSelection();
   };
-
-  /* ===== Helpers ===== */
-  function htmlToPlain(html){
-    const div = document.createElement("div");
-    div.innerHTML = html || "";
-    return (div.textContent || div.innerText || "").replace(/\u00A0/g," ");
-  }
-
-  function escapeHTML(str){
-    return str.replace(/[&<>"']/g, (ch) => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[ch]));
-  }
-
-  function insertTextAtCursor(text){
-    const sel = window.getSelection();
-    if(!sel || sel.rangeCount === 0) return;
-    const range = sel.getRangeAt(0);
-    range.deleteContents();
-    const node = document.createTextNode(text);
-    range.insertNode(node);
-    range.setStartAfter(node);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-
-  function placeCaretAtEnd(el){
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    range.collapse(false);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
 
   /* ===== Init ===== */
   renderCalendar();

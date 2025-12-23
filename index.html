@@ -20,13 +20,15 @@
     --line: rgba(0,0,0,.06);
     --soft: rgba(0,0,0,.03);
 
+    /* 5 highlight colors */
     --p1: rgba(255, 243, 199, .95);
     --p2: rgba(208, 244, 222, .95);
     --p3: rgba(221, 214, 255, .95);
     --p4: rgba(255, 214, 226, .95);
     --p5: rgba(207, 235, 255, .95);
 
-    --sidebar-w: 360px; /* slightly slimmer so week fits */
+    --sidebar-w: 380px;
+    --today-yellow: rgba(255, 214, 10, .32);
   }
 
   html,body{
@@ -35,14 +37,14 @@
     font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
     background:var(--bg);
     color:var(--ink);
-    overflow:hidden; /* ✅ no page scroll */
+    overflow:hidden;
   }
 
   .app{
-    height:100vh;            /* ✅ lock to viewport */
+    height:100vh;
     display:grid;
     grid-template-columns: var(--sidebar-w) 1fr;
-    overflow:hidden;         /* ✅ no scrollbars */
+    overflow:hidden;
   }
 
   /* ===== Sidebar ===== */
@@ -52,12 +54,11 @@
     display:flex;
     flex-direction:column;
     gap:12px;
-    overflow:hidden; /* ✅ keep sidebar fixed */
+    overflow:hidden;
     min-width: var(--sidebar-w);
   }
 
-  .calendar-wrap{ flex: 0 0 auto; }
-
+  /* Calendar header */
   .sidebar-header{
     display:flex;
     justify-content:space-between;
@@ -66,19 +67,21 @@
   }
   .sidebar-header strong{
     font-size:20px;
-    font-weight:800;
+    font-weight:900;
   }
-  .sidebar-header button{
+
+  .navbtn{
     border:none;
-    background:none;
-    font-size:24px;
-    padding:2px 8px;
+    background:rgba(0,0,0,.04);
+    font-size:18px;
+    padding:6px 10px;
     cursor:pointer;
     color:var(--ink);
-    border-radius:10px;
+    border-radius:12px;
   }
-  .sidebar-header button:hover{ background:rgba(0,0,0,.04); }
+  .navbtn:hover{ background:rgba(0,0,0,.06); }
 
+  /* Month calendar */
   .dow,.calendar{
     display:grid;
     grid-template-columns:repeat(7,1fr);
@@ -88,25 +91,49 @@
     font-size:13px;
     color:var(--muted);
     padding:6px 0 8px;
-    font-weight:600;
+    font-weight:700;
   }
+
   .day{
-    padding:12px 0;
+    padding:10px 0 8px;
     border-radius:12px;
     cursor:pointer;
-    font-size:16px;
-    font-weight:500;
+    font-size:15px;
+    font-weight:800;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
   }
   .day:hover{ background:rgba(0,0,0,.04); }
   .day.inactive{ color:#c7c7cc; }
-  .day.today{ font-weight:800; }
-  .day.active{
-    background:rgba(0,122,255,1);
-    color:#fff;
-    font-weight:800;
+
+  /* today = yellow */
+  .day.today{
+    background: var(--today-yellow);
   }
 
-  /* Ideas board (fits without forcing scroll) */
+  /* selected = blue */
+  .day.active{
+    background: rgba(0,122,255,1) !important;
+    color: #fff !important;
+  }
+
+  .dots{
+    display:flex;
+    gap:5px;
+    height:8px;
+    align-items:center;
+    justify-content:center;
+  }
+  .dot{
+    width:6px;
+    height:6px;
+    border-radius:999px;
+  }
+
+  /* ===== Ideas ===== */
   .ideas{
     flex:1 1 auto;
     min-height:0;
@@ -115,14 +142,13 @@
     gap:10px;
     padding-top:6px;
     border-top:1px solid var(--line);
-    overflow:hidden; /* ✅ keep panel fixed */
+    overflow:hidden;
   }
   .ideas-title{ padding-top:8px; }
   .ideas-title h2{
     margin:0;
     font-size:18px;
     font-weight:900;
-    letter-spacing:.2px;
   }
   .idea-input input{
     width:100%;
@@ -134,15 +160,15 @@
     outline:none;
     font-family: inherit;
   }
-  .idea-input input:focus{ background:rgba(0,0,0,.06); }
-
   .idea-list{
     flex:1 1 auto;
     min-height:0;
-    overflow:auto; /* ✅ only ideas list can scroll if needed */
+    overflow:auto;
     padding-right:4px;
   }
+
   .idea-item{
+    position:relative;
     display:grid;
     grid-template-columns:18px 1fr;
     gap:10px;
@@ -161,7 +187,6 @@
     cursor:grab;
     opacity:.85;
   }
-  .idea-item:active .handle{ cursor:grabbing; }
   .idea-text{
     font-size:15px;
     line-height:1.35;
@@ -169,25 +194,52 @@
     word-break:break-word;
   }
 
+  /* highlights */
+  .hl1{ background: var(--p1) !important; }
+  .hl2{ background: var(--p2) !important; }
+  .hl3{ background: var(--p3) !important; }
+  .hl4{ background: var(--p4) !important; }
+  .hl5{ background: var(--p5) !important; }
+
   /* ===== Main ===== */
   .main{
-    padding:18px 18px;    /* ✅ tighter */
-    overflow:hidden;      /* ✅ no main scroll */
+    padding:16px 16px;
+    overflow:hidden;
     display:flex;
     flex-direction:column;
     min-width:0;
+    gap:10px;
   }
 
-  .note-title{
-    font-size: clamp(18px, 2.2vw, 28px);
-    font-weight:900;
-    margin:0 0 6px 0;
-    letter-spacing:.2px;
+  /* Weekly title with week switch buttons on left/right */
+  .titlebar{
+    display:grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items:center;
+    gap:10px;
   }
-  .note-sub{
-    font-size: clamp(12px, 1.3vw, 16px);
+  .titlebar .left{ justify-self:start; }
+  .titlebar .center{
+    justify-self:center;
+    text-align:center;
+    min-width:0;
+  }
+  .titlebar .right{ justify-self:end; }
+
+  .week-title{
+    font-size: clamp(16px, 2.0vw, 26px);
+    font-weight:900;
+    letter-spacing:.2px;
+    margin:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .week-sub{
+    font-size: clamp(12px, 1.2vw, 15px);
     color:var(--muted);
-    margin:0 0 14px 0;
+    margin:0;
+    text-align:center;
   }
 
   /* Week grid Mon–Sat */
@@ -195,12 +247,12 @@
     flex:1 1 auto;
     min-height:0;
     display:grid;
-    grid-template-columns:repeat(6, minmax(0, 1fr)); /* ✅ always fit */
+    grid-template-columns:repeat(6, minmax(0, 1fr));
     gap:0;
-    overflow:hidden; /* ✅ no scroll */
+    overflow:hidden;
   }
   .day-col{
-    padding:0 14px;
+    padding:0 12px;
     position:relative;
     min-width:0;
   }
@@ -219,8 +271,8 @@
     align-items:baseline;
     gap:8px;
     font-weight:900;
-    font-size: clamp(12px, 1.4vw, 18px);
-    margin:0 0 10px 0;
+    font-size: clamp(12px, 1.35vw, 18px);
+    margin:0 0 8px 0;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -231,7 +283,7 @@
     font-weight:700;
   }
 
-  .section{ margin-bottom:12px; }
+  .section{ margin-bottom:10px; }
   .section-emoji{
     font-size: clamp(14px, 1.6vw, 18px);
     margin-bottom:6px;
@@ -257,7 +309,7 @@
   }
 
   .task-body{
-    font-size: clamp(12px, 1.25vw, 16px);
+    font-size: clamp(12px, 1.15vw, 15px);
     line-height:1.45;
     white-space:pre-wrap;
     word-break:break-word;
@@ -265,14 +317,12 @@
     min-height:2.1em;
     font-family: inherit;
 
-    /* ✅ keep within box visually (no inner scroll) */
     overflow:hidden;
     display:-webkit-box;
-    -webkit-line-clamp: 3;         /* max 3 lines display */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
   }
 
-  /* Hover X (delete) */
   .task-x{
     position:absolute;
     top:6px;
@@ -295,23 +345,16 @@
     color: rgba(255,59,48,1);
   }
 
-  /* highlights for whole task */
-  .hl1{ background: var(--p1) !important; }
-  .hl2{ background: var(--p2) !important; }
-  .hl3{ background: var(--p3) !important; }
-  .hl4{ background: var(--p4) !important; }
-  .hl5{ background: var(--p5) !important; }
-
   .editing{
     background: rgba(0,0,0,.04) !important;
   }
   .editing .task-body{
-    -webkit-line-clamp: unset; /* allow full editing view */
+    -webkit-line-clamp: unset;
     overflow: visible;
     display:block;
   }
 
-  /* Palette (colors + none) */
+  /* Palette */
   .palette{
     position:fixed;
     z-index:9999;
@@ -354,14 +397,15 @@
   .dragging{ opacity:.55; }
   .drop-target{ background: rgba(0,0,0,.06) !important; }
 
-  /* If someone opens on small screens, allow vertical scroll rather than breaking */
   @media (max-width: 1100px){
     html,body{ overflow:auto; }
     .app{ height:auto; overflow:visible; grid-template-columns:1fr; }
-    .sidebar{ border-right:none; border-bottom:1px solid var(--line); }
+    .sidebar{ border-right:none; border-bottom:1px solid var(--line); min-width:auto; }
     .main{ overflow:visible; }
     .week{ overflow:visible; grid-template-columns:1fr; }
     .day-col:not(:last-child)::after{ display:none; }
+    .task-handle{ opacity:1; }
+    .task-x{ display:block; }
   }
 </style>
 </head>
@@ -372,9 +416,9 @@
   <aside class="sidebar">
     <div class="calendar-wrap">
       <div class="sidebar-header">
-        <button id="prevMonth" aria-label="Previous month">‹</button>
+        <button class="navbtn" id="prevMonth" aria-label="Previous month">‹</button>
         <strong id="monthLabel"></strong>
-        <button id="nextMonth" aria-label="Next month">›</button>
+        <button class="navbtn" id="nextMonth" aria-label="Next month">›</button>
       </div>
 
       <div class="dow" aria-hidden="true">
@@ -399,15 +443,30 @@
   </aside>
 
   <main class="main">
-    <div class="note-title" id="weekTitle"></div>
-    <div class="note-sub" id="weekRange"></div>
+
+    <!-- week buttons on left/right of title -->
+    <div class="titlebar">
+      <div class="left">
+        <button class="navbtn" id="prevWeek" aria-label="Previous week">‹</button>
+      </div>
+
+      <div class="center">
+        <h1 class="week-title" id="weekTitle"></h1>
+        <p class="week-sub" id="weekRange"></p>
+      </div>
+
+      <div class="right">
+        <button class="navbtn" id="nextWeek" aria-label="Next week">›</button>
+      </div>
+    </div>
+
     <div class="week" id="week"></div>
   </main>
 
 </div>
 
-<!-- Color palette (ONLY shows when clicking ⋮⋮) -->
-<div class="palette" id="taskPalette" role="dialog" aria-label="Highlight colors">
+<!-- Palette -->
+<div class="palette" id="palette" role="dialog" aria-label="Highlight colors">
   <div class="swatch sw0" data-hl="" title="None"></div>
   <div class="swatch sw1" data-hl="hl1" title="Highlight 1"></div>
   <div class="swatch sw2" data-hl="hl2" title="Highlight 2"></div>
@@ -418,19 +477,21 @@
 
 <script>
   /* ===== Storage ===== */
-  const KEY = "weekly_notes_fullscreen_v1";
+  const KEY = "weekly_notes_weektitle_nav_v1";
   const store = safeParse(localStorage.getItem(KEY)) || { days:{}, ideas:[] };
   function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
   const save = () => localStorage.setItem(KEY, JSON.stringify(store));
   if(!store.days) store.days = {};
   if(!Array.isArray(store.ideas)) store.ideas = [];
 
+  const SLOTS = 3;
+
   function ensureDay(k){
-    if(!store.days[k]) store.days[k] = { m:[null,null], a:[null,null], e:[null,null] };
+    if(!store.days[k]) store.days[k] = { m:Array(SLOTS).fill(null), a:Array(SLOTS).fill(null), e:Array(SLOTS).fill(null) };
     for(const part of ["m","a","e"]){
-      if(!Array.isArray(store.days[k][part])) store.days[k][part] = [null,null];
-      store.days[k][part] = store.days[k][part].slice(0,2);
-      while(store.days[k][part].length < 2) store.days[k][part].push(null);
+      if(!Array.isArray(store.days[k][part])) store.days[k][part] = Array(SLOTS).fill(null);
+      store.days[k][part] = store.days[k][part].slice(0,SLOTS);
+      while(store.days[k][part].length < SLOTS) store.days[k][part].push(null);
       store.days[k][part] = store.days[k][part].map(v => {
         if(!v) return null;
         if(typeof v === "string") return { t: v, hl: "" };
@@ -454,6 +515,34 @@
   const fmtMD = d => `${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`;
   const fmtShortDay = d => ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()];
 
+  function hlToDotColor(hl){
+    switch(hl){
+      case "hl1": return "var(--p1)";
+      case "hl2": return "var(--p2)";
+      case "hl3": return "var(--p3)";
+      case "hl4": return "var(--p4)";
+      case "hl5": return "var(--p5)";
+      default: return null;
+    }
+  }
+
+  function slotHasTextOrColor(dayKey, part, idx){
+    ensureDay(dayKey);
+    const v = store.days[dayKey][part][idx];
+    if(!v) return false;
+    const txt = htmlToPlain(v.t || "").trim();
+    return !!txt || !!v.hl;
+  }
+
+  function dayHasAnything(dayKey){
+    for(const p of ["m","a","e"]){
+      for(let i=0;i<SLOTS;i++){
+        if(slotHasTextOrColor(dayKey,p,i)) return true;
+      }
+    }
+    return false;
+  }
+
   /* ===== Calendar ===== */
   const calendar = document.getElementById("calendar");
   const monthLabel = document.getElementById("monthLabel");
@@ -462,14 +551,48 @@
     calendar.innerHTML = "";
     monthLabel.textContent = viewMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});
     const start = startOfWeek(new Date(viewMonth));
+
     for(let i=0;i<42;i++){
       const d = addDays(start,i);
+      const key = ymd(d);
+      ensureDay(key);
+
       const div = document.createElement("div");
       div.className = "day";
-      div.textContent = d.getDate();
+
+      const num = document.createElement("div");
+      num.textContent = d.getDate();
+      div.appendChild(num);
+
+      // dots: show ONLY if there is something; each dot only if that section's first slot has something
+      if(dayHasAnything(key)){
+        const dots = document.createElement("div");
+        dots.className = "dots";
+
+        const mkDot = (part)=>{
+          if(!slotHasTextOrColor(key, part, 0)) return null;
+          const c = hlToDotColor(store.days[key][part][0]?.hl || "");
+          if(!c) return null; // if no color, no dot (your rule)
+          const dot = document.createElement("div");
+          dot.className = "dot";
+          dot.style.background = c;
+          return dot;
+        };
+
+        const d1 = mkDot("m");
+        const d2 = mkDot("a");
+        const d3 = mkDot("e");
+        if(d1) dots.appendChild(d1);
+        if(d2) dots.appendChild(d2);
+        if(d3) dots.appendChild(d3);
+
+        if(dots.childElementCount > 0) div.appendChild(dots);
+      }
+
       if(d.getMonth()!==viewMonth.getMonth()) div.classList.add("inactive");
-      if(ymd(d)===ymd(today)) div.classList.add("today");
-      if(ymd(d)===ymd(active)) div.classList.add("active");
+      if(key===ymd(today)) div.classList.add("today");
+      if(key===ymd(active)) div.classList.add("active");
+
       div.onclick = ()=>{ active=new Date(d); renderCalendar(); renderWeek(); hidePalette(); };
       calendar.appendChild(div);
     }
@@ -482,24 +605,36 @@
   function newId(){
     return Math.random().toString(16).slice(2) + Date.now().toString(16);
   }
-  function addIdea(text){
+
+  function addIdea(text, hl=""){
     const t = (text || "").trim();
     if(!t) return;
-    store.ideas.unshift({ id: newId(), text: t });
+    store.ideas.unshift({ id: newId(), text: t, hl });
     ideaInput.value = "";
     save();
     renderIdeas();
   }
+
   function removeIdea(id){
     store.ideas = store.ideas.filter(x => x.id !== id);
     save();
     renderIdeas();
   }
+
+  function setIdeaHighlight(id, hl){
+    const idea = store.ideas.find(x => x.id === id);
+    if(!idea) return;
+    idea.hl = hl || "";
+    save();
+    renderIdeas();
+  }
+
   function renderIdeas(){
     ideaList.innerHTML = "";
     for(const idea of store.ideas){
       const item = document.createElement("div");
       item.className = "idea-item";
+      if(idea.hl) item.classList.add(idea.hl);
       item.draggable = true;
       item.dataset.ideaId = idea.id;
 
@@ -513,21 +648,89 @@
       text.textContent = idea.text;
       item.appendChild(text);
 
+      // dblclick = delete
       item.addEventListener("dblclick", () => removeIdea(idea.id));
 
+      // palette for ideas via dots
+      handle.addEventListener("mousedown", (e)=>e.preventDefault());
+      handle.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        setActiveTarget({ type:"idea", ideaId: idea.id, el: item });
+        showPaletteNear(item);
+      });
+
+      // drag idea -> tasks
       item.addEventListener("dragstart", (e) => {
         item.classList.add("dragging");
         e.dataTransfer.effectAllowed = "move";
         e.dataTransfer.setData("text/plain", JSON.stringify({ type:"idea", ideaId: idea.id }));
       });
-
       item.addEventListener("dragend", () => {
         item.classList.remove("dragging");
         document.querySelectorAll(".drop-target").forEach(el => el.classList.remove("drop-target"));
       });
 
+      // drop task onto ideas list area (move task -> new idea)
+      item.addEventListener("dragover", (e)=>{ e.preventDefault(); item.classList.add("drop-target"); });
+      item.addEventListener("dragleave", ()=> item.classList.remove("drop-target"));
+      item.addEventListener("drop", (e)=>{
+        e.preventDefault();
+        item.classList.remove("drop-target");
+        hidePalette();
+
+        let payloadDrag;
+        try { payloadDrag = JSON.parse(e.dataTransfer.getData("text/plain")); }
+        catch { return; }
+
+        if(payloadDrag.type !== "task") return;
+
+        const from = payloadDrag.from;
+        ensureDay(from.dayKey);
+
+        const src = store.days[from.dayKey][from.part][from.idx];
+        if(!src) return;
+
+        const plain = htmlToPlain(src.t || "").trim();
+        if(plain){
+          store.ideas.unshift({ id: newId(), text: plain, hl: src.hl || "" });
+        }
+        store.days[from.dayKey][from.part][from.idx] = null;
+
+        save();
+        renderIdeas();
+        renderWeek();
+        renderCalendar();
+      });
+
       ideaList.appendChild(item);
     }
+
+    // Also allow dropping tasks into the empty space of the ideas list (not just onto an item)
+    ideaList.ondragover = (e)=>{ e.preventDefault(); };
+    ideaList.ondrop = (e)=>{
+      e.preventDefault();
+      hidePalette();
+      let payloadDrag;
+      try { payloadDrag = JSON.parse(e.dataTransfer.getData("text/plain")); }
+      catch { return; }
+      if(payloadDrag.type !== "task") return;
+
+      const from = payloadDrag.from;
+      ensureDay(from.dayKey);
+      const src = store.days[from.dayKey][from.part][from.idx];
+      if(!src) return;
+
+      const plain = htmlToPlain(src.t || "").trim();
+      if(plain){
+        store.ideas.unshift({ id: newId(), text: plain, hl: src.hl || "" });
+      }
+      store.days[from.dayKey][from.part][from.idx] = null;
+
+      save();
+      renderIdeas();
+      renderWeek();
+      renderCalendar();
+    };
   }
 
   // IME fix (Korean)
@@ -583,7 +786,7 @@
         icon.textContent = emoji;
         sec.appendChild(icon);
 
-        for(let slot=0; slot<2; slot++){
+        for(let slot=0; slot<SLOTS; slot++){
           const task = document.createElement("div");
           task.className = "task";
           task.draggable = true;
@@ -619,25 +822,26 @@
           });
           task.appendChild(xbtn);
 
-          // Palette ONLY via dots
+          // palette via dots only
           handle.addEventListener("mousedown", (e) => e.preventDefault());
           handle.addEventListener("click", (e) => {
             e.stopPropagation();
             if(task.classList.contains("editing")) return;
-            setActiveTask(task);
+            setActiveTarget({ type:"task", taskEl: task });
             showPaletteNear(task);
           });
 
-          // Double click edit (no palette)
+          // double click edit
           task.addEventListener("dblclick", (e) => {
             e.preventDefault();
-            setActiveTask(task);
+            setActiveTarget({ type:"task", taskEl: task });
             enterEditMode(task);
           });
 
           body.addEventListener("input", () => {
             if(body.contentEditable !== "true") return;
             writeTaskText(task, body.innerHTML);
+            renderCalendar();
           });
 
           body.addEventListener("paste", (e) => {
@@ -646,6 +850,7 @@
             const text = (e.clipboardData || window.clipboardData).getData("text/plain");
             insertTextAtCursor(text);
             writeTaskText(task, body.innerHTML);
+            renderCalendar();
           });
 
           body.addEventListener("blur", () => exitEditMode(task));
@@ -656,6 +861,7 @@
             }
           });
 
+          // drop target
           task.addEventListener("dragover", (e) => {
             e.preventDefault();
             task.classList.add("drop-target");
@@ -688,6 +894,7 @@
 
               save();
               renderWeek();
+              renderCalendar();
               return;
             }
 
@@ -697,20 +904,23 @@
 
               const current = store.days[to.dayKey][to.part][to.idx];
               const insert = escapeHTML(idea.text).replace(/\n/g, "<br>");
-              const nextText = current && current.t && current.t.trim()
+              const nextText = current && current.t && htmlToPlain(current.t).trim()
                 ? (current.t + "<br>" + insert)
                 : insert;
 
-              store.days[to.dayKey][to.part][to.idx] = { t: nextText, hl: (current?.hl || "") };
+              const keepHL = (current?.hl || "") || (idea.hl || "");
+              store.days[to.dayKey][to.part][to.idx] = { t: nextText, hl: keepHL };
               store.ideas = store.ideas.filter(x => x.id !== payloadDrag.ideaId);
 
               save();
               renderIdeas();
               renderWeek();
+              renderCalendar();
               return;
             }
           });
 
+          // drag start (task -> task OR task -> ideas)
           task.addEventListener("dragstart", (e) => {
             if(task.classList.contains("editing")) { e.preventDefault(); return; }
             const sel = window.getSelection();
@@ -742,14 +952,14 @@
     save();
   }
 
-  /* ===== Palette ===== */
-  const palette = document.getElementById("taskPalette");
-  let activeTaskEl = null;
+  /* ===== Palette (for BOTH tasks and ideas) ===== */
+  const palette = document.getElementById("palette");
+  let activeTarget = null;
 
-  function setActiveTask(task){ activeTaskEl = task; }
+  function setActiveTarget(t){ activeTarget = t; }
 
-  function showPaletteNear(task){
-    const rect = task.getBoundingClientRect();
+  function showPaletteNear(el){
+    const rect = el.getBoundingClientRect();
     const pad = 10;
     const palW = 210;
     const left = Math.min(Math.max(rect.left + rect.width/2 - palW/2, pad), window.innerWidth - palW - pad);
@@ -762,7 +972,7 @@
 
   function hidePalette(){
     palette.style.display = "none";
-    activeTaskEl = null;
+    activeTarget = null;
   }
 
   function getTaskKey(task){
@@ -787,6 +997,7 @@
     const next = cur ? { t: cur.t || "", hl: hlClass } : { t: "", hl: hlClass };
     store.days[dayKey][part][idx] = next;
     save();
+    renderCalendar();
   }
 
   function clearTask(task){
@@ -795,6 +1006,7 @@
     store.days[dayKey][part][idx] = null;
     save();
     renderWeek();
+    renderCalendar();
   }
 
   function enterEditMode(task){
@@ -814,24 +1026,60 @@
     task.classList.remove("editing");
   }
 
-  document.querySelectorAll("#taskPalette .swatch").forEach(sw => {
+  document.querySelectorAll("#palette .swatch").forEach(sw => {
     sw.addEventListener("mousedown", (e) => e.preventDefault());
     sw.addEventListener("click", () => {
-      if(!activeTaskEl) return;
-      setTaskHighlight(activeTaskEl, sw.dataset.hl || "");
+      if(!activeTarget) return;
+      const hl = sw.dataset.hl || "";
+
+      if(activeTarget.type === "task"){
+        setTaskHighlight(activeTarget.taskEl, hl);
+      } else if(activeTarget.type === "idea"){
+        setIdeaHighlight(activeTarget.ideaId, hl);
+      }
       hidePalette();
     });
   });
 
   document.addEventListener("mousedown", (e) => {
     if(palette.contains(e.target)) return;
-    if(e.target.closest && e.target.closest(".task-handle")) return;
+    if(e.target.closest && (e.target.closest(".task-handle") || e.target.closest(".idea-item .handle"))) return;
     hidePalette();
   });
 
-  window.addEventListener("scroll", () => hidePalette(), { passive:true });
+  /* ===== Month nav ===== */
+  document.getElementById("prevMonth").onclick = () => {
+    viewMonth.setMonth(viewMonth.getMonth()-1);
+    renderCalendar();
+  };
+  document.getElementById("nextMonth").onclick = () => {
+    viewMonth.setMonth(viewMonth.getMonth()+1);
+    renderCalendar();
+  };
+
+  /* ===== Week nav (buttons around title) ===== */
+  document.getElementById("prevWeek").onclick = () => {
+    active = addDays(active, -7);
+    viewMonth = new Date(active.getFullYear(), active.getMonth(), 1);
+    renderCalendar();
+    renderWeek();
+    hidePalette();
+  };
+  document.getElementById("nextWeek").onclick = () => {
+    active = addDays(active, +7);
+    viewMonth = new Date(active.getFullYear(), active.getMonth(), 1);
+    renderCalendar();
+    renderWeek();
+    hidePalette();
+  };
 
   /* ===== Helpers ===== */
+  function htmlToPlain(html){
+    const div = document.createElement("div");
+    div.innerHTML = html || "";
+    return (div.textContent || div.innerText || "").replace(/\u00A0/g," ");
+  }
+
   function escapeHTML(str){
     return str.replace(/[&<>"']/g, (ch) => ({
       "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
@@ -860,16 +1108,7 @@
     sel.addRange(range);
   }
 
-  /* ===== Month nav ===== */
-  document.getElementById("prevMonth").onclick=()=>{
-    viewMonth.setMonth(viewMonth.getMonth()-1);
-    renderCalendar();
-  };
-  document.getElementById("nextMonth").onclick=()=>{
-    viewMonth.setMonth(viewMonth.getMonth()+1);
-    renderCalendar();
-  };
-
+  /* ===== Initialize ===== */
   renderCalendar();
   renderIdeas();
   renderWeek();

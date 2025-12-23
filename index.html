@@ -20,14 +20,13 @@
     --line: rgba(0,0,0,.06);
     --soft: rgba(0,0,0,.03);
 
-    /* 5 pastel highlight colors (for the whole block) */
     --p1: rgba(255, 243, 199, .95);
     --p2: rgba(208, 244, 222, .95);
     --p3: rgba(221, 214, 255, .95);
     --p4: rgba(255, 214, 226, .95);
     --p5: rgba(207, 235, 255, .95);
 
-    --sidebar-w: 380px;
+    --sidebar-w: 360px; /* slightly slimmer so week fits */
   }
 
   html,body{
@@ -36,40 +35,44 @@
     font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
     background:var(--bg);
     color:var(--ink);
+    overflow:hidden; /* ✅ no page scroll */
   }
 
   .app{
-    height:100%;
+    height:100vh;            /* ✅ lock to viewport */
     display:grid;
     grid-template-columns: var(--sidebar-w) 1fr;
+    overflow:hidden;         /* ✅ no scrollbars */
   }
 
   /* ===== Sidebar ===== */
   .sidebar{
     border-right:1px solid var(--line);
-    padding:22px 20px;
+    padding:16px 16px;
     display:flex;
     flex-direction:column;
-    gap:18px;
-    overflow:hidden;
+    gap:12px;
+    overflow:hidden; /* ✅ keep sidebar fixed */
+    min-width: var(--sidebar-w);
   }
 
-  /* Calendar */
+  .calendar-wrap{ flex: 0 0 auto; }
+
   .sidebar-header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:14px;
+    margin-bottom:10px;
   }
   .sidebar-header strong{
-    font-size:22px;
+    font-size:20px;
     font-weight:800;
   }
   .sidebar-header button{
     border:none;
     background:none;
-    font-size:26px;
-    padding:4px 8px;
+    font-size:24px;
+    padding:2px 8px;
     cursor:pointer;
     color:var(--ink);
     border-radius:10px;
@@ -82,16 +85,16 @@
     text-align:center;
   }
   .dow div{
-    font-size:14px;
+    font-size:13px;
     color:var(--muted);
-    padding:8px 0 12px;
+    padding:6px 0 8px;
     font-weight:600;
   }
   .day{
-    padding:16px 0;
+    padding:12px 0;
     border-radius:12px;
     cursor:pointer;
-    font-size:18px;
+    font-size:16px;
     font-weight:500;
   }
   .day:hover{ background:rgba(0,0,0,.04); }
@@ -103,7 +106,7 @@
     font-weight:800;
   }
 
-  /* Ideas board */
+  /* Ideas board (fits without forcing scroll) */
   .ideas{
     flex:1 1 auto;
     min-height:0;
@@ -112,11 +115,12 @@
     gap:10px;
     padding-top:6px;
     border-top:1px solid var(--line);
+    overflow:hidden; /* ✅ keep panel fixed */
   }
-  .ideas-title{ padding-top:12px; }
+  .ideas-title{ padding-top:8px; }
   .ideas-title h2{
     margin:0;
-    font-size:20px;
+    font-size:18px;
     font-weight:900;
     letter-spacing:.2px;
   }
@@ -125,14 +129,17 @@
     border:none;
     border-radius:12px;
     background:rgba(0,0,0,.04);
-    padding:12px 12px;
-    font-size:16px;
+    padding:10px 10px;
+    font-size:15px;
     outline:none;
     font-family: inherit;
   }
   .idea-input input:focus{ background:rgba(0,0,0,.06); }
+
   .idea-list{
-    overflow:auto;
+    flex:1 1 auto;
+    min-height:0;
+    overflow:auto; /* ✅ only ideas list can scroll if needed */
     padding-right:4px;
   }
   .idea-item{
@@ -140,12 +147,10 @@
     grid-template-columns:18px 1fr;
     gap:10px;
     align-items:start;
-    padding:10px 10px;
+    padding:9px 9px;
     border-radius:14px;
   }
   .idea-item:hover{ background:var(--soft); }
-
-  /* handle */
   .handle{
     width:18px;
     height:22px;
@@ -157,41 +162,47 @@
     opacity:.85;
   }
   .idea-item:active .handle{ cursor:grabbing; }
-
   .idea-text{
-    font-size:17px;
-    line-height:1.4;
+    font-size:15px;
+    line-height:1.35;
     white-space:pre-wrap;
     word-break:break-word;
   }
 
   /* ===== Main ===== */
   .main{
-    padding:42px 46px;
-    overflow-y:auto;
+    padding:18px 18px;    /* ✅ tighter */
+    overflow:hidden;      /* ✅ no main scroll */
+    display:flex;
+    flex-direction:column;
+    min-width:0;
   }
+
   .note-title{
-    font-size:36px;
+    font-size: clamp(18px, 2.2vw, 28px);
     font-weight:900;
-    margin-bottom:10px;
-    letter-spacing:.3px;
+    margin:0 0 6px 0;
+    letter-spacing:.2px;
   }
   .note-sub{
-    font-size:19px;
+    font-size: clamp(12px, 1.3vw, 16px);
     color:var(--muted);
-    margin-bottom:44px;
+    margin:0 0 14px 0;
   }
 
   /* Week grid Mon–Sat */
   .week{
+    flex:1 1 auto;
+    min-height:0;
     display:grid;
-    grid-template-columns:repeat(6,minmax(240px,1fr));
+    grid-template-columns:repeat(6, minmax(0, 1fr)); /* ✅ always fit */
     gap:0;
+    overflow:hidden; /* ✅ no scroll */
   }
   .day-col{
-    padding:0 30px;
+    padding:0 14px;
     position:relative;
-    min-width:240px;
+    min-width:0;
   }
   .day-col:not(:last-child)::after{
     content:"";
@@ -206,21 +217,24 @@
   .day-name{
     display:flex;
     align-items:baseline;
-    gap:10px;
+    gap:8px;
     font-weight:900;
-    font-size:22px;
-    margin-bottom:22px;
+    font-size: clamp(12px, 1.4vw, 18px);
+    margin:0 0 10px 0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
   .day-date{
-    font-size:14px;
+    font-size: clamp(10px, 1.0vw, 12px);
     color:var(--muted);
     font-weight:700;
   }
 
-  .section{ margin-bottom:34px; }
+  .section{ margin-bottom:12px; }
   .section-emoji{
-    font-size:24px;
-    margin-bottom:12px;
+    font-size: clamp(14px, 1.6vw, 18px);
+    margin-bottom:6px;
   }
 
   /* Task block */
@@ -228,9 +242,9 @@
     position: relative;
     display:grid;
     grid-template-columns:18px 1fr;
-    gap:10px;
+    gap:8px;
     align-items:start;
-    padding:10px 10px;
+    padding:8px 8px;
     border-radius:14px;
     background:transparent;
   }
@@ -243,28 +257,34 @@
   }
 
   .task-body{
-    font-size:20px;
-    line-height:1.6;
+    font-size: clamp(12px, 1.25vw, 16px);
+    line-height:1.45;
     white-space:pre-wrap;
     word-break:break-word;
     outline:none;
-    min-height:2.2em;
+    min-height:2.1em;
     font-family: inherit;
+
+    /* ✅ keep within box visually (no inner scroll) */
+    overflow:hidden;
+    display:-webkit-box;
+    -webkit-line-clamp: 3;         /* max 3 lines display */
+    -webkit-box-orient: vertical;
   }
 
   /* Hover X (delete) */
   .task-x{
     position:absolute;
-    top:8px;
-    right:8px;
-    width:22px;
-    height:22px;
+    top:6px;
+    right:6px;
+    width:20px;
+    height:20px;
     border-radius:999px;
     border:none;
     background: rgba(0,0,0,.06);
     color: rgba(0,0,0,.45);
-    font-size:16px;
-    line-height:22px;
+    font-size:15px;
+    line-height:20px;
     padding:0;
     cursor:pointer;
     display:none;
@@ -282,9 +302,13 @@
   .hl4{ background: var(--p4) !important; }
   .hl5{ background: var(--p5) !important; }
 
-  /* editing mode */
   .editing{
     background: rgba(0,0,0,.04) !important;
+  }
+  .editing .task-body{
+    -webkit-line-clamp: unset; /* allow full editing view */
+    overflow: visible;
+    display:block;
   }
 
   /* Palette (colors + none) */
@@ -298,12 +322,12 @@
     box-shadow:0 18px 48px rgba(0,0,0,.18);
     border:1px solid rgba(0,0,0,.06);
     backdrop-filter: blur(12px);
-    gap:12px;
+    gap:10px;
     align-items:center;
   }
   .swatch{
-    width:20px;
-    height:20px;
+    width:18px;
+    height:18px;
     border-radius:999px;
     border:1px solid rgba(0,0,0,.08);
     cursor:pointer;
@@ -320,7 +344,6 @@
     border-radius:999px;
     background: rgba(0,0,0,.05);
   }
-
   .sw1{ background: var(--p1); }
   .sw2{ background: var(--p2); }
   .sw3{ background: var(--p3); }
@@ -331,18 +354,14 @@
   .dragging{ opacity:.55; }
   .drop-target{ background: rgba(0,0,0,.06) !important; }
 
-  @media (max-width: 980px){
-    .app{ grid-template-columns:1fr; }
-    .sidebar{
-      border-right:none;
-      border-bottom:1px solid var(--line);
-      max-height:55vh;
-    }
-    .week{ grid-template-columns:1fr; }
-    .day-col{ padding:22px 0; }
-    .day-col::after{ display:none; }
-    .task-handle{ opacity:1; }
-    .task-x{ display:block; }
+  /* If someone opens on small screens, allow vertical scroll rather than breaking */
+  @media (max-width: 1100px){
+    html,body{ overflow:auto; }
+    .app{ height:auto; overflow:visible; grid-template-columns:1fr; }
+    .sidebar{ border-right:none; border-bottom:1px solid var(--line); }
+    .main{ overflow:visible; }
+    .week{ overflow:visible; grid-template-columns:1fr; }
+    .day-col:not(:last-child)::after{ display:none; }
   }
 </style>
 </head>
@@ -399,14 +418,13 @@
 
 <script>
   /* ===== Storage ===== */
-  const KEY = "weekly_notes_things_palette_v4";
+  const KEY = "weekly_notes_fullscreen_v1";
   const store = safeParse(localStorage.getItem(KEY)) || { days:{}, ideas:[] };
   function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
   const save = () => localStorage.setItem(KEY, JSON.stringify(store));
   if(!store.days) store.days = {};
   if(!Array.isArray(store.ideas)) store.ideas = [];
 
-  /* Day payload: { m:[{t,hl},{t,hl}], a:[...], e:[...] } */
   function ensureDay(k){
     if(!store.days[k]) store.days[k] = { m:[null,null], a:[null,null], e:[null,null] };
     for(const part of ["m","a","e"]){
@@ -457,14 +475,13 @@
     }
   }
 
-  /* ===== Ideas board ===== */
+  /* ===== Ideas ===== */
   const ideaInput = document.getElementById("ideaInput");
   const ideaList = document.getElementById("ideaList");
 
   function newId(){
     return Math.random().toString(16).slice(2) + Date.now().toString(16);
   }
-
   function addIdea(text){
     const t = (text || "").trim();
     if(!t) return;
@@ -473,13 +490,11 @@
     save();
     renderIdeas();
   }
-
   function removeIdea(id){
     store.ideas = store.ideas.filter(x => x.id !== id);
     save();
     renderIdeas();
   }
-
   function renderIdeas(){
     ideaList.innerHTML = "";
     for(const idea of store.ideas){
@@ -498,7 +513,6 @@
       text.textContent = idea.text;
       item.appendChild(text);
 
-      // dblclick in ideas = delete (simple)
       item.addEventListener("dblclick", () => removeIdea(idea.id));
 
       item.addEventListener("dragstart", (e) => {
@@ -516,21 +530,20 @@
     }
   }
 
-  // FIX: Korean IME composition (no partial submit)
+  // IME fix (Korean)
   let ideaComposing = false;
   ideaInput.addEventListener("compositionstart", () => { ideaComposing = true; });
   ideaInput.addEventListener("compositionend", () => { ideaComposing = false; });
 
   ideaInput.addEventListener("keydown", (e) => {
     if(e.key === "Enter"){
-      // IMPORTANT: don't submit while IME is composing
       if (ideaComposing || e.isComposing) return;
       e.preventDefault();
       addIdea(ideaInput.value);
     }
   });
 
-  /* ===== Week (Mon–Sat) ===== */
+  /* ===== Week ===== */
   const weekEl = document.getElementById("week");
   const weekTitle = document.getElementById("weekTitle");
   const weekRange = document.getElementById("weekRange");
@@ -588,12 +601,11 @@
 
           const body = document.createElement("div");
           body.className = "task-body";
-          body.contentEditable = "false"; // locked by default
+          body.contentEditable = "false";
           body.spellcheck = true;
           body.innerHTML = payload ? (payload.t || "") : "";
           task.appendChild(body);
 
-          // Hover X delete button
           const xbtn = document.createElement("button");
           xbtn.className = "task-x";
           xbtn.type = "button";
@@ -607,7 +619,7 @@
           });
           task.appendChild(xbtn);
 
-          /* Palette opens ONLY when clicking the dots */
+          // Palette ONLY via dots
           handle.addEventListener("mousedown", (e) => e.preventDefault());
           handle.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -616,20 +628,18 @@
             showPaletteNear(task);
           });
 
-          /* Double click toggles edit mode — palette should NOT pop */
+          // Double click edit (no palette)
           task.addEventListener("dblclick", (e) => {
             e.preventDefault();
             setActiveTask(task);
             enterEditMode(task);
           });
 
-          /* Save edits on input (only when editable) */
           body.addEventListener("input", () => {
             if(body.contentEditable !== "true") return;
             writeTaskText(task, body.innerHTML);
           });
 
-          /* paste plain text when editing */
           body.addEventListener("paste", (e) => {
             if(body.contentEditable !== "true") return;
             e.preventDefault();
@@ -638,10 +648,7 @@
             writeTaskText(task, body.innerHTML);
           });
 
-          /* Exit edit mode on blur */
           body.addEventListener("blur", () => exitEditMode(task));
-
-          /* Escape to stop editing */
           body.addEventListener("keydown", (e) => {
             if(e.key === "Escape"){
               e.preventDefault();
@@ -649,7 +656,6 @@
             }
           });
 
-          /* Drag targets */
           task.addEventListener("dragover", (e) => {
             e.preventDefault();
             task.classList.add("drop-target");
@@ -691,13 +697,11 @@
 
               const current = store.days[to.dayKey][to.part][to.idx];
               const insert = escapeHTML(idea.text).replace(/\n/g, "<br>");
-
               const nextText = current && current.t && current.t.trim()
                 ? (current.t + "<br>" + insert)
                 : insert;
 
               store.days[to.dayKey][to.part][to.idx] = { t: nextText, hl: (current?.hl || "") };
-
               store.ideas = store.ideas.filter(x => x.id !== payloadDrag.ideaId);
 
               save();
@@ -707,7 +711,6 @@
             }
           });
 
-          /* Dragging a task block (swap) */
           task.addEventListener("dragstart", (e) => {
             if(task.classList.contains("editing")) { e.preventDefault(); return; }
             const sel = window.getSelection();
@@ -718,11 +721,7 @@
             e.dataTransfer.effectAllowed = "move";
             e.dataTransfer.setData("text/plain", JSON.stringify({
               type: "task",
-              from: {
-                dayKey: task.dataset.dayKey,
-                part: task.dataset.part,
-                idx: Number(task.dataset.idx)
-              }
+              from: { dayKey: task.dataset.dayKey, part: task.dataset.part, idx: Number(task.dataset.idx) }
             }));
           });
 
@@ -743,19 +742,18 @@
     save();
   }
 
-  /* ===== Color palette ===== */
+  /* ===== Palette ===== */
   const palette = document.getElementById("taskPalette");
   let activeTaskEl = null;
 
   function setActiveTask(task){ activeTaskEl = task; }
 
   function showPaletteNear(task){
-    if(!task) return;
     const rect = task.getBoundingClientRect();
     const pad = 10;
-    const palW = 220; // includes "none"
+    const palW = 210;
     const left = Math.min(Math.max(rect.left + rect.width/2 - palW/2, pad), window.innerWidth - palW - pad);
-    const top = Math.max(rect.top - 58, pad);
+    const top = Math.max(rect.top - 54, pad);
 
     palette.style.left = `${left}px`;
     palette.style.top = `${top}px`;
@@ -801,7 +799,7 @@
 
   function enterEditMode(task){
     document.querySelectorAll(".task.editing").forEach(t => exitEditMode(t));
-    hidePalette(); // IMPORTANT: never show palette while typing
+    hidePalette();
     task.classList.add("editing");
     const body = task.querySelector(".task-body");
     body.contentEditable = "true";
@@ -816,7 +814,6 @@
     task.classList.remove("editing");
   }
 
-  // Swatches apply immediately, including None
   document.querySelectorAll("#taskPalette .swatch").forEach(sw => {
     sw.addEventListener("mousedown", (e) => e.preventDefault());
     sw.addEventListener("click", () => {
@@ -826,7 +823,6 @@
     });
   });
 
-  // click outside closes palette
   document.addEventListener("mousedown", (e) => {
     if(palette.contains(e.target)) return;
     if(e.target.closest && e.target.closest(".task-handle")) return;
